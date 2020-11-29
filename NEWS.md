@@ -1,3 +1,22 @@
+# 0.1.7
+
+* URL for doi in vignettes
+
+# 0.1.6
+
+* basic vignette
+* rm .internal.selfref attr for mapped df
+* assertthat instead of stopifnot
+
+# 0.1.5
+
+* data.R adding set.seed
+* lack of a one bracket in description file
+
+# 0.1.4
+
+* remove the unnecessary imports in the DESCRIPTION file
+
 # cat2cat 0.1.3
 
 * Title reduce to less than 65 characters.
