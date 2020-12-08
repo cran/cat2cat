@@ -5,8 +5,7 @@ knitr::opts_chunk$set(message = F)
 knitr::opts_chunk$set(warning = F)
 
 ## -----------------------------------------------------------------------------
-options(scipen = 999)
-pacman::p_load(cat2cat, dplyr)
+pacman::p_load(cat2cat, dplyr, igraph)
 
 ## -----------------------------------------------------------------------------
 data(occup)
@@ -18,6 +17,10 @@ occup %>% glimpse()
 
 ## -----------------------------------------------------------------------------
 trans %>% glimpse()
+
+## -----------------------------------------------------------------------------
+gg = graph_from_data_frame(trans[1:40, ])
+plot.igraph(gg)
 
 ## -----------------------------------------------------------------------------
 mappings <- get_mappings(trans)
@@ -64,7 +67,10 @@ occup_3 <- cat2cat(
 )
 
 ## -----------------------------------------------------------------------------
-cor(occup_3$old$wei_knn_c2c, occup_3$old$wei_freq_c2c, use = "complete.obs")
+cor(occup_3$old[, grepl("wei.*c2c", colnames(occup_3$old))], use = "complete.obs")
+
+## -----------------------------------------------------------------------------
+plot_c2c(occup_3$old, type = c("both"))
 
 ## -----------------------------------------------------------------------------
 occup_3 %>% glimpse()
@@ -74,4 +80,25 @@ get_freqs(x = occup_3$new$g_new_c2c, multiplier = floor(occup_3$new$multiplier  
 
 ## -----------------------------------------------------------------------------
 get_freqs(x = occup_2$old$g_new_c2c, multiplier  = floor(occup_2$old$multiplier  * occup_2$old$wei_freq_c2c))  %>% head()
+
+## -----------------------------------------------------------------------------
+## orginal dataset 
+lms2 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old, weights = multiplier)
+summary(lms2)
+
+## using one highest cross weights
+## cross_c2c to cross different methods weights
+## prune_c2c - highest1 leave only one the highest probability obs for each subject
+occup_old_3 <- occup_3$old %>% 
+                cross_c2c(., c("wei_freq_c2c", "wei_knn_c2c"), c(1/2,1/2)) %>% 
+                prune_c2c(.,column = "wei_cross_c2c", method = "highest1") 
+lms <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier)
+summary(lms)
+
+## we have to adjust size of stds as we artificially enlarge degrees of freedom
+occup_old_3 <- occup_3$old %>% 
+                prune_c2c(method = "nonzero") # many different prune methods like highest
+lms1 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier * wei_freq_c2c)
+## summary_c2c
+summary_c2c(lms1, df_old = nrow(occup_old), df_new = nrow(occup_old_3))
 

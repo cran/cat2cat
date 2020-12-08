@@ -1,3 +1,16 @@
+# 0.2.0
+
+* plot_c2c
+
+# 0.1.9
+
+* vignette improvements
+
+# 0.1.8
+
+* pt inside summary_c2c
+* VignetteIndexEntry
+
 # 0.1.7
 
 * URL for doi in vignettes
@@ -37,7 +50,7 @@
 # cat2cat 0.1.0
 
 * More ml methods for `cat2cat` function - "knn", "rf", "lda".
-* `prune_cat2cat` and `cross_cat2cat` to improve processing of results.
+* `prune_c2c` and `cross_c2c` to improve processing of results.
 * Enable cat2cat for panel with unique identifier.
 * Turn on github actions - covr, pkgdown, check.
 * Preparation before R CRAN.

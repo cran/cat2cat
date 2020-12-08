@@ -1,6 +1,6 @@
 Package: cat2cat
 Title: Mapping of a Categorical Variable in a Panel Dataset
-Version: 0.1.7
+Version: 0.2.0
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Maintainer: Maciej Nasinski <nasinski.maciej@gmail.com>
 Description: 
@@ -15,12 +15,12 @@ BugReports: https://github.com/Polkas/cat2cat/issues
 Encoding: UTF-8
 Imports: rlang, caret, progress, randomForest, MASS, tidyr, dplyr,
         data.table, assertthat
-Suggests: knitr, rmarkdown, pacman, testthat, magrittr
+Suggests: knitr, rmarkdown, pacman, testthat, magrittr, igraph
 LazyData: true
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2020-11-28 23:01:57 UTC; maciejnasinski
+Packaged: 2020-12-08 20:06:35 UTC; maciejnasinski
 Author: Maciej Nasinski [aut, cre]
 Repository: CRAN
-Date/Publication: 2020-11-29 05:30:02 UTC
+Date/Publication: 2020-12-08 21:10:02 UTC
