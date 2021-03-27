@@ -100,5 +100,5 @@ occup_old_3 <- occup_3$old %>%
                 prune_c2c(method = "nonzero") # many different prune methods like highest
 lms1 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier * wei_freq_c2c)
 ## summary_c2c
-summary_c2c(lms1, df_old = nrow(occup_old), df_new = nrow(occup_old_3))
+summary_c2c(lms1, df_old = nrow(occup_old))
 
