@@ -2,22 +2,23 @@
 % Please edit documentation in R/plot_cat2cat.R
 \name{plot_c2c}
 \alias{plot_c2c}
-\title{Summary plots for cat2cat results.}
+\title{Summary plots for cat2cat results}
 \usage{
-plot_c2c(data, weis = "wei_freq_c2c", type = "both")
+plot_c2c(data, weis = "wei_freq_c2c", type = c("both", "hist", "bar"))
 }
 \arguments{
-\item{data}{data.frame}
+\item{data}{data.frame - one of the data.frames returned by the `cat2cat` function.}
 
-\item{weis}{character - name of a certain wei_*_c2c column added by cat2cat function. Default wei_freq_c2c}
+\item{weis}{character - name of a certain wei_*_c2c column, added by cat2cat function. Default wei_freq_c2c}
 
-\item{type}{character - one of 3 types both, hist, bar}
+\item{type}{character - one of 3 types `"both"`, `"hist"`, `"bar"`.}
 }
 \value{
 base plot graphics
 }
 \description{
-This function help to understand properties of cat2cat resuls and possibly before further preprocessing.
+This function help to understand properties of cat2cat results.
+It is recommended to run it before further processing, like next iterations.
 }
 \note{
 It will work only for data.frame produced by cat2cat function.
@@ -28,12 +29,11 @@ occup_old <- occup_small[occup_small$year == 2008, ]
 occup_new <- occup_small[occup_small$year == 2010, ]
 
 occup_2 <- cat2cat(
-data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-mappings = list(trans = trans, direction = "backward")
+  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  mappings = list(trans = trans, direction = "backward")
 )
 
 plot_c2c(occup_2$old, type = c("both"))
 plot_c2c(occup_2$old, type = c("hist"))
 plot_c2c(occup_2$old, type = c("bar"))
-
 }

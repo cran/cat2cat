@@ -85,7 +85,6 @@ get_freqs(x = occup_2$old$g_new_c2c, multiplier  = floor(occup_2$old$multiplier 
 ## orginal dataset 
 lms2 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old, weights = multiplier)
 summary(lms2)
-
 ## using one highest cross weights
 ## cross_c2c to cross different methods weights
 ## prune_c2c - highest1 leave only one the highest probability obs for each subject
@@ -98,7 +97,11 @@ summary(lms)
 ## we have to adjust size of stds as we artificially enlarge degrees of freedom
 occup_old_3 <- occup_3$old %>% 
                 prune_c2c(method = "nonzero") # many different prune methods like highest
-lms1 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier * wei_freq_c2c)
+lms_replicated <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier * wei_freq_c2c)
 ## summary_c2c
-summary_c2c(lms1, df_old = nrow(occup_old))
+summary_c2c(lms_replicated, df_old = nrow(occup_old))
+# or
+# Adjusted R2 is meaningless here
+lms_replicated$df.residual <- nrow(occup_old) - length(lms_replicated$assign)
+suppressWarnings(summary(lms_replicated))
 

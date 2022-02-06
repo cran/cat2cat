@@ -1,10 +1,9 @@
-#' Aggregate panel dataset - Manual mapping of a categorical variable according to a new encoding
-#' @description Aggregate dataset - Manual mapping of a categorical variable according to a new encoding where user supplying transitions by equations.
-#' @param data list with 5 named fields `old` `new` `cat_var` `time_var` `freq_var`
-#' @param ... equations
-#' @return list of data.frame objects
-#' @details
-#' data args
+#' Manual mapping of a categorical variable according to a new encoding for aggregated panel dataset
+#' @description Aggregate panel dataset - Manual mapping of a categorical variable according to a new encoding where user providing transitions with equations.
+#' @param data list with 5 named fields `old`, `new`, `cat_var`, `time_var`, `freq_var`.
+#' @param ... equations where direction is set with any of `>`, `<`, `\%>\%`, `\%<\%`.
+#' @return list of two data.frame objects.
+#' @details data argument - list with fields
 #' \itemize{
 #'  \item{"old"}{ data.frame older time point in the panel}
 #'  \item{"new"} { data.frame more recent time point in the panel}
@@ -12,24 +11,27 @@
 #'  \item{"time_var"}{ character name of time variable}
 #'  \item{"freq_var"}{ character name of frequency variable}
 #' }
-#' ... equations where direction is set by ">","<","%>%","%<%"
-#' @examples
-#'data(verticals)
-#'agg_old <- verticals[verticals$v_date == "2020-04-01", ]
-#'agg_new <- verticals[verticals$v_date == "2020-05-01", ]
-#'
-#'## cat2cat_man - could map in both directions at once although
-#'## usually we want to have oold or new representation
-#'
-#'agg = cat2cat_agg(data = list(old = agg_old,
-#'                              new = agg_new,
-#'                              cat_var = "vertical",
-#'                              time_var = "v_date",
-#'                              freq_var = "counts"),
-#'                  Automotive %<% c(Automotive1, Automotive2),
-#'                  c(Kids1, Kids2) %>% c(Kids),
-#'                  Home %>% c(Home, Supermarket))
 #' @export
+#' @examples
+#' data(verticals)
+#' agg_old <- verticals[verticals$v_date == "2020-04-01", ]
+#' agg_new <- verticals[verticals$v_date == "2020-05-01", ]
+#'
+#' ## cat2cat_man - could map in both directions at once although
+#' ## usually we want to have oold or new representation
+#'
+#' agg <- cat2cat_agg(
+#'   data = list(
+#'     old = agg_old,
+#'     new = agg_new,
+#'     cat_var = "vertical",
+#'     time_var = "v_date",
+#'     freq_var = "counts"
+#'   ),
+#'   Automotive %<% c(Automotive1, Automotive2),
+#'   c(Kids1, Kids2) %>% c(Kids),
+#'   Home %>% c(Home, Supermarket)
+#' )
 cat2cat_agg <- function(data = list(
                           old = NULL,
                           new = NULL,
@@ -40,7 +42,7 @@ cat2cat_agg <- function(data = list(
   # methods most frequent, proportional
 
   assert_that(
-      is.list(data) &&
+    is.list(data) &&
       length(data) == 5 &&
       all(vapply(data, Negate(is.null), logical(1))) &&
       inherits(data$old, "data.frame") &&
