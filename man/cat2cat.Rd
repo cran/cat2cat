@@ -34,7 +34,7 @@ data args
 \itemize{
  \item{"old"}{ data.frame older time point in a panel}
  \item{"new"} { data.frame more recent time point in a panel}
- \item{"cat_var"}{ character name of the categorical variable. NA values are autoamically converted to "NA" strings.}
+ \item{"cat_var"}{ character name of the categorical variable. NA values are automatically converted to "NA" strings.}
  \item{"time_var"}{ character name of the time variable}
  \item{"id_var"}{ optional character name of the unique identifier variable - if this is specified then for subjects observe in both periods the direct mapping is applied.}
  \item{"multiplier_var"}{ optional character name of the multiplier variable - number of replication needed to reproduce the population}
@@ -65,6 +65,7 @@ The observation from targeted for an updated period without a matched category f
 If you want to leave NA values add `c(NA, NA)` row to the `trans` table.
 }
 \examples{
+\dontrun{
 data(occup_small)
 data(occup)
 data(trans)
@@ -74,13 +75,13 @@ occup_new <- occup_small[occup_small$year == 2010, ]
 
 # default only simple frequencies
 
-occup_2 <- cat2cat(
+occup_simple <- cat2cat(
   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
   mappings = list(trans = trans, direction = "forward")
 )
 
 # additionally add probabilities from knn
-occup_3 <- cat2cat(
+occup_ml <- cat2cat(
   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
   mappings = list(trans = trans, direction = "forward"),
   ml = list(
@@ -89,4 +90,6 @@ occup_3 <- cat2cat(
     args = list(k = 10)
   )
 )
+}
+
 }

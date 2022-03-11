@@ -17,8 +17,8 @@
 #' agg_old <- verticals[verticals$v_date == "2020-04-01", ]
 #' agg_new <- verticals[verticals$v_date == "2020-05-01", ]
 #'
-#' ## cat2cat_man - could map in both directions at once although
-#' ## usually we want to have oold or new representation
+#' ## cat2cat_agg - could map in both directions at once although
+#' ## usually we want to have old or new representation
 #'
 #' agg <- cat2cat_agg(
 #'   data = list(
@@ -59,9 +59,9 @@ cat2cat_agg <- function(data = list(
 
   assert_that(all(table(data$old[[data$cat_var]]) == 1) && all(table(data$new[[data$cat_var]]) == 1))
 
-  t <- enexprs(...)
+  t <- as.list(substitute(list(...))[-1])
 
-  trans <- read_eq(!!!t)
+  trans <- do.call(read_eq, t)
   trans_map <- lapply(trans, format_trans)
 
   df_old <- data$old
@@ -91,7 +91,7 @@ cat2cat_agg <- function(data = list(
       }
 
       df_new <- rbind(base, base_rm)
-    } else if (i$direction == "backword") {
+    } else if (i$direction == "backward") {
       base <- df_old[!(df_old[, data$cat_var] %in% i[[2]]), ]
       base_rm <- df_old[df_old[, data$cat_var] %in% i[[2]], ]
 
@@ -105,8 +105,6 @@ cat2cat_agg <- function(data = list(
       }
 
       df_old <- rbind(base, base_rm)
-    } else {
-      stop()
     }
   }
 
