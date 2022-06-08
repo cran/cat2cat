@@ -5,18 +5,18 @@
 \title{Automatic mapping of a categorical variable in a panel dataset according to a new encoding}
 \usage{
 cat2cat(
-  data = list(old = NULL, new = NULL, cat_var = NULL, id_var = NULL, time_var = NULL,
-    multiplier_var = NULL, freqs_df = NULL),
+  data = list(old = NULL, new = NULL, cat_var = NULL, cat_var_old = NULL, cat_var_new =
+    NULL, id_var = NULL, time_var = NULL, multiplier_var = NULL, freqs_df = NULL),
   mappings = list(trans = NULL, direction = NULL),
-  ml = list(method = NULL, features = NULL, args = NULL)
+  ml = list(data = NULL, cat_var = NULL, method = NULL, features = NULL, args = NULL)
 )
 }
 \arguments{
-\item{data}{list with 4, 5, 6 or 7 named fields `old` `new` `cat_var` `time_var` and optional `id_var`,`multiplier_var`,`freq_df`}
+\item{data}{`named list` with fields `old`, `new`, `cat_var` (or `cat_var_old` and `cat_var_new`), `time_var` and optional `id_var`,`multiplier_var`,`freq_df`.}
 
-\item{mappings}{list with 2 named fields `trans` `direction`}
+\item{mappings}{`named list` with 2 fields `trans` and `direction`.}
 
-\item{ml}{list with 3 named fields `method` `features` `args`}
+\item{ml}{`named list` with up to 5 fields `data`, `cat_var`, `method`, `features` and optional `args`.}
 }
 \value{
 named list with 2 fields old an new - 2 data.frames.
@@ -34,11 +34,15 @@ data args
 \itemize{
  \item{"old"}{ data.frame older time point in a panel}
  \item{"new"} { data.frame more recent time point in a panel}
- \item{"cat_var"}{ character name of the categorical variable. NA values are automatically converted to "NA" strings.}
- \item{"time_var"}{ character name of the time variable}
+ \item{"cat_var"}{ character name of the categorical variable.}
+ \item{"cat_var_old"}{ optional character name of the categorical variable in the older time point. Default `cat_var`.}
+ \item{"cat_var_new"}{ optional character name of the categorical variable in the newer time point. Default `cat_var`.}
+ \item{"time_var"}{ character name of the time variable.}
  \item{"id_var"}{ optional character name of the unique identifier variable - if this is specified then for subjects observe in both periods the direct mapping is applied.}
  \item{"multiplier_var"}{ optional character name of the multiplier variable - number of replication needed to reproduce the population}
- \item{"freqs_df"}{ optional only for advanced users - data.frame with 2 columns where first one is category name and second counts which will be used to assess the probabilities.}
+ \item{"freqs_df"}{ optional - data.frame with 2 columns where first one is category name and second counts.
+ It is optional nevertheless will be very often needed, as give more control.
+ It will be used to assess the probabilities. The multiplier variable is omit so sb has to apply it in this table.}
 }
 mappings args
 \itemize{
@@ -50,19 +54,22 @@ mappings args
 }
 optional ml args
 \itemize{
+ \item{"data"}{ data.frame - dataset with features and the `cat_var`.}
+ \item{"cat_var"}{ character - the dependent variable name. It has to be compatible with the `cat_var` in the target period.}
  \item{"method"}{ character vector - one or a few from "knn", "rf" and "lda" methods - "knn" k-NearestNeighbors, "lda" Linear Discrimination Analysis, "rf" Random Forest }
  \item{"features"}{ character vector of features names where all have to be numeric or logical}
- \item{"args"}{ list parameters: knn: k ; rf: ntree  }
+ \item{"args"}{ optional - list parameters: knn: k ; rf: ntree  }
 }
 
 Without ml section only simple frequencies are assessed.
 When ml model is broken then weights from simple frequencies are taken.
-Method knn is recommended for smaller datasets.
+`knn` method is recommended for smaller datasets.
 }
 \note{
 The transition table should to have a candidate for each category from the targeted for an update period.
 The observation from targeted for an updated period without a matched category from base period is removed.
 If you want to leave NA values add `c(NA, NA)` row to the `trans` table.
+Please check the vignette for more information.
 }
 \examples{
 \dontrun{
@@ -85,6 +92,8 @@ occup_ml <- cat2cat(
   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
   mappings = list(trans = trans, direction = "forward"),
   ml = list(
+    data = occup_old,
+    cat_var = "code",
     method = "knn",
     features = c("age", "sex", "edu", "exp", "parttime", "salary"),
     args = list(k = 10)

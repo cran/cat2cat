@@ -23,97 +23,61 @@ knitr::opts_chunk$set(warning = F)
 
 ## `cat2cat`
 
-The introduced `cat2cat` algorithm was designed to offer an easy and clear interface to apply a transition table which was provided by a data maintainer or built by a researcher. The objective is to unify an inconsistent coded categorical variable in a panel dataset, where a transition table is the core element of the process.
+The introduced `cat2cat` algorithm was designed to offer an easy and clear interface to apply a mapping table (transition table) which was provided by a data maintainer or built by a researcher. The objective is to unify an inconsistent coded categorical variable in a panel dataset, where a transition table is the core element of the process.
 
 Examples of a dataset with such inconsistent coded categorical variable are ISCO (The International Standard Classification of Occupations) or ICD (International Classification of Diseases) based one. The both classifications are regularly updated to adjust to e.g. new science achievements. More clearly we might image that e.g. new science achievements brings new occupations types on the market or enable recognition of new diseases types.
 
-The categorical variable encoding changes are typically provided by datasets providers in the form of transition table, for each time point the changes occurred. A transition table conveys information needed for matching all categories between two periods of time. More precisely it contains two columns where the first column contains old categories and the second column contains the new ones.
+The categorical variable encoding changes are typically provided by datasets providers in the transition table form, for each time point the changes occurred. A transition table conveys information needed for matching all categories between two periods of time. More precisely it contains two columns where the first column contains old categories and the second column contains the new ones.
 Sometimes a transition table has to be created manually by a researcher.
 
 The main rule is to replicate the observation if it could be assigned to a few categories.
-More precisely for each observation we look across a transition table to check how the original category could be mapped to the opposite period one. Then using simple frequencies or statistical methods to approximate probabilities of being assigned to each of them.
+More precisely for each observation we look across a transition table to check how the original category could be mapped to the opposite period one. Then using simple frequencies or statistical methods to approximate weights (probabilities) of being assigned to each of them.
 For each observation that was replicated, the probabilities have to add up to one.
 The algorithm distinguishes different mechanics for panel data with and without unique identifiers.
 
 ## Core elements
 
-There should be highlighted 3 important elements:
+There are 3 important elements:
 
-1. Type of the data - panel dataset with unique identifiers vs panel dataset without unique identifiers, aggregate data vs unit data.
-2. Transition table. 
+1. Transition table, possibly a few for longer panels. 
+2. Type of the data - panel dataset with unique identifiers vs panel dataset without unique identifiers and aggregate data vs non-aggragate data.
 3. Direction of a transition, forward or backward - a new or an old encoding as a base one.
 
-## Manual transitions
-### Aggregate dataset
+## Data
 
-```{r}
+`occup` dataset is an example of unbalance panel dataset.
+This is a simulated data although there are applied a real world characteristics from national statistical office survey.
+The original survey is anonymous and take place **every two years**.
+
+`trans` dataset containing transitions between old (2008) and new (2010) occupational codes.
+This table could be used to map encodings in both directions.
+
+```{r, message=FALSE, warning=FALSE}
 library(cat2cat)
 library(dplyr)
 
-data(verticals)
-agg_old <- verticals[verticals$v_date == "2020-04-01", ]
-agg_new <- verticals[verticals$v_date == "2020-05-01", ]
-
-## cat2cat_agg - could map in both directions at once although 
-## usually we want to have old or new representation
-
-agg <- cat2cat_agg(data = list(old = agg_old, 
-                              new = agg_new, 
-                              cat_var = "vertical", 
-                              time_var = "v_date",
-                              freq_var = "counts"), 
-                  Automotive %<% c(Automotive1, Automotive2),
-                  c(Kids1, Kids2) %>% c(Kids),
-                  Home %>% c(Home, Supermarket))
-            
-## possible processing
-  
-agg$old %>% 
-group_by(vertical) %>% 
-summarise(sales = sum(sales*prop_c2c), counts = sum(counts*prop_c2c), v_date = first(v_date))
-
-agg$new %>% 
-group_by(vertical) %>%
-summarise(sales = sum(sales*prop_c2c), counts = sum(counts*prop_c2c), v_date = first(v_date))
-```
-
-## Automatic using trans table
-
-### Dataset with unique identifiers
-
-```{r}
-## the ean variable is a unique identifier
-data(verticals2)
-
-vert_old <- verticals2[verticals2$v_date == "2020-04-01", ]
-vert_new <- verticals2[verticals2$v_date == "2020-05-01", ]
-
-## get transitions table
-trans_v <- vert_old %>% 
-inner_join(vert_new, by = "ean") %>%
-select(vertical.x, vertical.y) %>% distinct()
-```
-
-```{r}
-# 
-## cat2cat
-## it is important to set id_var as then we merging categories 1 to 1 
-## for this identifier which exists in both periods.
-verts <- cat2cat(
-  data = list(old = vert_old, new = vert_new, id_var = "ean", cat_var = "vertical", time_var = "v_date"),
-  mappings = list(trans = trans_v, direction = "backward")
-)
-```
-
-### Dataset without unique identifiers
-
-```{r}
 data(occup)
 data(trans)
 
-occup_old <- occup[occup$year == 2008,]
-occup_new <- occup[occup$year == 2010,]
+occup_old <- occup[occup$year == 2008, ]
+occup_new <- occup[occup$year == 2010, ]
+
+occup_2006 <- occup[occup$year == 2006, ]
+occup_2008 <- occup[occup$year == 2008, ]
+occup_2010 <- occup[occup$year == 2010, ]
+occup_2012 <- occup[occup$year == 2012, ]
 ```
+
+## Dataset without unique identifiers
+
+There were prepared two graphs for forward and backward mapping.
+These graphs present how the `cat2cat::cat2cat` function works, in this case under a panel dataset without the unique identifiers and only two periods.
+
+![Backward Mapping](https://raw.githubusercontent.com/Polkas/cat2cat/master/man/figures/back_nom.png)
+
+![Forward Mapping](https://raw.githubusercontent.com/Polkas/cat2cat/master/man/figures/for_nom.png)
+
+### Example - 2 periods
 
 ```{r}
 ## cat2cat
@@ -123,32 +87,296 @@ occup_simple <- cat2cat(
 )
 
 ## with informative features it might be usefull to run ml algorithm
-## currently only knn, lda or rf (randomForest),  a few methods could be specified at once 
+## currently only knn, lda or rf (randomForest),  a few methods could be specified at once
 ## where probability will be assessed as fraction of closest points.
 occup_2 <- cat2cat(
   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
   mappings = list(trans = trans, direction = "backward"),
-  ml = list(method = "knn", features = c("age", "sex", "edu", "exp", "parttime", "salary"), 
-            args = list(k = 10))
+  ml = list(
+    data = occup_new,
+    cat_var = "code",
+    method = "knn",
+    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
+    args = list(k = 10)
+  )
 )
+```
 
+`plot_c2c` offers a summary of the replication process.
+
+```{r}
 # summary_plot
 plot_c2c(occup_2$old, type = c("both"))
+```
 
+Example for the 2 period panel dataset.
+
+```{r}
 # mix of methods
 occup_2_mix <- cat2cat(
   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
   mappings = list(trans = trans, direction = "backward"),
-  ml = list(method = c("knn", "rf", "lda"), features = c("age", "sex", "edu", "exp", "parttime", "salary"), 
-            args = list(k = 10, ntree = 50))
+  ml = list(
+    data = occup_new,
+    cat_var = "code",
+    method = c("knn", "rf", "lda"),
+    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
+    args = list(k = 10, ntree = 50)
+  )
 )
-# correlation between ml models and simple fequencies
-occup_2_mix$old %>% select(wei_knn_c2c, wei_rf_c2c, wei_lda_c2c, wei_freq_c2c) %>% cor()
 # cross all methods and subset one highest probability category for each subject
-occup_old_mix_highest1 <- occup_2_mix$old %>% 
-                cross_c2c(.) %>% 
-                prune_c2c(.,column = "wei_cross_c2c", method = "highest1") 
+occup_old_mix_highest1 <- occup_2_mix$old %>%
+  cross_c2c(.) %>%
+  prune_c2c(., column = "wei_cross_c2c", method = "highest1")
 ```
+
+Correlations between different methods of assesing weights are presented.
+
+```{r}
+# correlation between ml models and simple fequencies
+occup_2_mix$old %>%
+  select(wei_knn_c2c, wei_rf_c2c, wei_lda_c2c, wei_freq_c2c) %>%
+  cor()
+```
+
+### Example - More than 2 periods
+
+When we have to map more than 2 time points, then
+cat2cat has to be used recursively. 
+However when only three periods have to be mapped, the middle one
+might be used as the base one.  
+If we have to apply many mapping tables across time then pruning methods might be needed to limit the exponentially growing number of replications.
+Such pruning methods are used to remove some of the replications, for example, leaving only
+one observation with the highest probability for each observation
+replication. Another strategy might be removing the zero probability
+replications. As such, pruning methods could be used before transferring a
+dataset to the next iteration to reduce the problem of the exponentially
+growing number of observations.
+
+Example with 4 period and only one mapping table:
+
+#### Backward
+
+Unification Process:
+
+```{r}
+# 2010 -> 2008
+occup_back_2008_2010 <- cat2cat(
+  data = list(old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"),
+  mappings = list(trans = trans, direction = "backward")
+)
+
+# optional, give more control
+# the counts could be any of wei_* or their combination
+freq_df <- occup_back_2008_2010$old[, c("g_new_c2c", "wei_freq_c2c")] %>%
+  group_by(g_new_c2c) %>%
+  summarise(counts = round(sum(wei_freq_c2c)))
+
+# 2008 -> 2006
+occup_back_2006_2008 <- cat2cat(
+  data = list(
+    old = occup_2006,
+    new = occup_back_2008_2010$old,
+    cat_var_new = "g_new_c2c",
+    cat_var_old = "code",
+    time_var = "year",
+    freqs_df = freq_df
+  ),
+  mappings = list(trans = trans, direction = "backward")
+)
+
+occup_2006_new <- occup_back_2006_2008$old
+occup_2008_new <- occup_back_2008_2010$old # or occup_back_2006_2008$new
+occup_2010_new <- occup_back_2008_2010$new
+# use ml argument when applied ml models
+occup_2012_new <- dummy_c2c(occup_2012, "code")
+
+final_data_back <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
+```
+
+Valiation of global counts and per variable level counts:
+
+```{r}
+# We persist the number of observations
+counts_new <- final_data_back %>%
+  cross_c2c() %>%
+  group_by(year) %>%
+  summarise(
+    n = as.integer(round(sum(wei_freq_c2c))),
+    n2 = as.integer(round(sum(wei_cross_c2c)))
+  )
+
+counts_old <- occup %>%
+  group_by(year) %>%
+  summarise(n = n(), n2 = n(), .groups = "drop")
+
+identical(counts_new, counts_old)
+
+# counts per each level
+counts_per_level <- final_data_back %>%
+  group_by(year, g_new_c2c) %>%
+  summarise(n = sum(wei_freq_c2c), .groups = "drop") %>%
+  arrange(g_new_c2c, year)
+```
+
+#### Forward
+
+Unification Process:
+
+A few categories levels are not in the trans table, lacking levels `setdiff(c(occup_2010$code, occup_2012$code), trans$new)`.
+We could solve it by adding a "no_cat" level for each of them in the `trans` table.
+
+```{r}
+trans2 <- rbind(trans, data.frame(old = "no_cat",
+                                  new = setdiff(c(occup_2010$code, occup_2012$code), trans$new)))
+```
+
+Of course the best solution will be to get these mappings from the data provider
+
+```{r}
+# 2008 -> 2010
+occup_for_2008_2010 <- cat2cat(
+  data = list(old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"),
+  mappings = list(trans = trans2, direction = "forward")
+)
+
+# optional, give more control
+# the counts could be any of wei_* or their combination
+freq_df <- occup_for_2008_2010$new[, c("g_new_c2c", "wei_freq_c2c")] %>%
+  group_by(g_new_c2c) %>%
+  summarise(counts = round(sum(wei_freq_c2c)))
+
+# 2010 -> 2012
+occup_for_2010_2012 <- cat2cat(
+  data = list(
+    old = occup_for_2008_2010$new,
+    new = occup_2012,
+    cat_var_old = "g_new_c2c",
+    cat_var_new = "code",
+    time_var = "year",
+    freqs_df = freq_df
+  ),
+  mappings = list(trans = trans2, direction = "forward")
+)
+
+# use ml argument when applied ml models
+occup_2006_new <- dummy_c2c(occup_2006, "code")
+occup_2008_new <- occup_for_2008_2010$old
+occup_2010_new <- occup_for_2008_2010$new # or occup_for_2010_2012$old
+occup_2012_new <- occup_for_2010_2012$new
+
+final_data_for <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
+```
+
+Valiation of global counts and per variable level counts.
+
+```{r}
+# We persist the number of observations
+counts_new <- final_data_for %>%
+  cross_c2c() %>%
+  group_by(year) %>%
+  summarise(
+    n = as.integer(round(sum(wei_freq_c2c))),
+    n2 = as.integer(round(sum(wei_cross_c2c)))
+  )
+
+counts_old <- occup %>%
+  group_by(year) %>%
+  summarise(n = n(), n2 = n(), .groups = "drop")
+
+identical(counts_new, counts_old)
+
+# counts per each level
+counts_per_level <- final_data_for %>%
+  group_by(year, g_new_c2c) %>%
+  summarise(n = sum(wei_freq_c2c), .groups = "drop") %>%
+  arrange(g_new_c2c, year)
+```
+
+#### Backward and ML
+
+Unification Process:
+
+```{r}
+# 2010 -> 2008
+occup_back_2008_2010 <- cat2cat(
+  data = list(old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"),
+  mappings = list(trans = trans, direction = "backward"),
+  ml = list(
+    data = dplyr::bind_rows(occup_2010, occup_2012),
+    cat_var = "code",
+    method = c("knn"),
+    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
+    args = list(k = 10)
+  )
+)
+
+# 2008 -> 2006
+occup_back_2006_2008 <- cat2cat(
+  data = list(
+    old = occup_2006,
+    new = occup_back_2008_2010$old,
+    cat_var_new = "g_new_c2c",
+    cat_var_old = "code",
+    time_var = "year"
+  ),
+  mappings = list(trans = trans, direction = "backward"),
+  ml = list(
+    data = dplyr::bind_rows(occup_2010, occup_2012),
+    cat_var = "code",
+    method = c("knn"),
+    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
+    args = list(k = 10)
+  )
+)
+
+occup_2006_new <- occup_back_2006_2008$old
+occup_2008_new <- occup_back_2008_2010$old # or occup_back_2006_2008$new
+occup_2010_new <- occup_back_2008_2010$new
+occup_2012_new <- dummy_c2c(occup_2012, cat_var = "code", ml = c("wei_knn_c2c"))
+
+final_data_back_ml <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
+```
+
+Valiation of global counts and per variable level counts.
+
+```{r}
+counts_new <- final_data_back_ml %>%
+  cross_c2c() %>%
+  group_by(year) %>%
+  summarise(
+    n = as.integer(round(sum(wei_freq_c2c))),
+    n2 = as.integer(round(sum(wei_cross_c2c))),
+    .groups = "drop"
+  )
+
+counts_old <- occup %>%
+  group_by(year) %>%
+  summarise(n = n(), n2 = n(), .groups = "drop")
+
+identical(counts_new, counts_old)
+
+# counts per each level
+counts_per_level <- final_data_back_ml %>%
+  group_by(year, g_new_c2c) %>%
+  summarise(n = sum(wei_freq_c2c), .groups = "drop") %>%
+  arrange(g_new_c2c, year)
+```
+
+Possible processing:
+
+```{r}
+ff <- final_data_back_ml %>%
+  split(.$year) %>%
+  lapply(function(x) {
+    x %>%
+      cross_c2c() %>%
+      prune_c2c(column = "wei_cross_c2c", method = "highest1")
+  }) %>%
+  bind_rows()
+all.equal(nrow(ff), sum(final_data_back_ml$wei_freq_c2c))
+```
+
 
 ## Regression
 
@@ -157,27 +385,27 @@ This is because for each observation which was replicated, probabilities sum to 
 If we are removing non-zero probability observations then replication probabilities have to be reweighed to still sum to one.
 Important note is that removing non zero probability observations should be done only if needed, as it impact the counts of categorical variable levels. More preciously removing non-zero weights will influence the regression model if we will use the unified categorical variable.
 
-### Regression
+### Regression - neutral impact
 
 The next 3 regressions have the same results.
 
 ```{r}
-## orginal dataset 
+## orginal dataset
 lms2 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old, weights = multiplier)
 summary(lms2)
 
 ## using one highest cross weights
 ## cross_c2c to cross differen methods weights
 ## prune_c2c - highest1 leave only one the highest probability obs for each subject
-occup_old_2 <- occup_2$old %>% 
-                cross_c2c(., c("wei_freq_c2c", "wei_knn_c2c"), c(1/2,1/2)) %>% 
-                prune_c2c(.,column = "wei_cross_c2c", method = "highest1") 
+occup_old_2 <- occup_2$old %>%
+  cross_c2c(., c("wei_freq_c2c", "wei_knn_c2c"), c(1 / 2, 1 / 2)) %>%
+  prune_c2c(., column = "wei_cross_c2c", method = "highest1")
 lms <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_2, weights = multiplier)
 summary(lms)
 
 ## we have to adjust size of stds as we artificialy enlarge degrees of freedom
-occup_old_3 <- occup_2$old %>% 
-                prune_c2c(method = "nonzero") #many prune methods like highest
+occup_old_3 <- occup_2$old %>%
+  prune_c2c(method = "nonzero") # many prune methods like highest
 lms_replicated <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier * wei_freq_c2c)
 # Adjusted R2 is meaningless here
 lms_replicated$df.residual <- nrow(occup_old) - length(lms_replicated$assign)
@@ -190,14 +418,13 @@ Example regression model with usage of the unified variable (`g_new_c2c`).
 A separate model for each occupational group.
 
 ```{r}
-occup_old_4 <- occup_2$old %>% 
-                prune_c2c(method = "nonzero") #many prune methods like highest
 formula_oo <- formula(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp + factor(year))
-oo <- rbind(occup_old_4, occup_2$new) %>% 
-  group_by(g_new_c2c) %>% 
+oo <- final_data_back %>%
+  prune_c2c(method = "nonzero") %>% # many prune methods like highest
+  group_by(g_new_c2c) %>%
   do(
     lm = tryCatch(
-      summary(lm(formula_oo, ., weights = multiplier * wei_freq_c2c)), 
+      summary(lm(formula_oo, ., weights = multiplier * wei_freq_c2c)),
       error = function(e) NULL
     )
   ) %>%
@@ -205,6 +432,74 @@ oo <- rbind(occup_old_4, occup_2$new) %>%
 
 head(oo)
 
-oo$lm[[1]]
+oo$lm[[2]]
 ```
 
+## Manual transitions
+
+`cat2cat_agg` is mainly useful for aggregate datasets.
+
+```{r}
+library(cat2cat)
+data(verticals)
+
+agg_old <- verticals[verticals$v_date == "2020-04-01", ]
+agg_new <- verticals[verticals$v_date == "2020-05-01", ]
+
+## cat2cat_agg - could map in both directions at once although
+## usually we want to have old or new representation
+
+agg <- cat2cat_agg(
+  data = list(
+    old = agg_old,
+    new = agg_new,
+    cat_var = "vertical",
+    time_var = "v_date",
+    freq_var = "counts"
+  ),
+  Automotive %<% c(Automotive1, Automotive2),
+  c(Kids1, Kids2) %>% c(Kids),
+  Home %>% c(Home, Supermarket)
+)
+
+## possible processing
+
+agg$old %>%
+  group_by(vertical) %>%
+  summarise(sales = sum(sales * prop_c2c), counts = sum(counts * prop_c2c), v_date = first(v_date))
+
+agg$new %>%
+  group_by(vertical) %>%
+  summarise(sales = sum(sales * prop_c2c), counts = sum(counts * prop_c2c), v_date = first(v_date))
+```
+
+## Dataset with unique identifiers
+
+If the panel datset is balanced so contains subjects id's then we could match some of the categories directly.
+Unfortunately we have to assume that a subject could not change the category level in time.
+
+```{r}
+library(cat2cat)
+## the ean variable is a unique identifier
+data(verticals2)
+
+vert_old <- verticals2[verticals2$v_date == "2020-04-01", ]
+vert_new <- verticals2[verticals2$v_date == "2020-05-01", ]
+
+## get transitions table
+trans_v <- vert_old %>%
+  inner_join(vert_new, by = "ean") %>%
+  select(vertical.x, vertical.y) %>%
+  distinct()
+```
+
+```{r}
+#
+## cat2cat
+## it is important to set id_var as then we merging categories 1 to 1
+## for this identifier which exists in both periods.
+verts <- cat2cat(
+  data = list(old = vert_old, new = vert_new, id_var = "ean", cat_var = "vertical", time_var = "v_date"),
+  mappings = list(trans = trans_v, direction = "backward")
+)
+```
