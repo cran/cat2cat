@@ -55,7 +55,7 @@ mappings args
 optional ml args
 \itemize{
  \item{"data"}{ data.frame - dataset with features and the `cat_var`.}
- \item{"cat_var"}{ character - the dependent variable name. It has to be compatible with the `cat_var` in the target period.}
+ \item{"cat_var"}{ character - the dependent variable name.}
  \item{"method"}{ character vector - one or a few from "knn", "rf" and "lda" methods - "knn" k-NearestNeighbors, "lda" Linear Discrimination Analysis, "rf" Random Forest }
  \item{"features"}{ character vector of features names where all have to be numeric or logical}
  \item{"args"}{ optional - list parameters: knn: k ; rf: ntree  }
@@ -80,17 +80,27 @@ data(trans)
 occup_old <- occup_small[occup_small$year == 2008, ]
 occup_new <- occup_small[occup_small$year == 2010, ]
 
-# default only simple frequencies
-
-occup_simple <- cat2cat(
-  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-  mappings = list(trans = trans, direction = "forward")
+# Adding the dummy level to the mapping table for levels without the candidate
+# The best to fill them manually with proper candidates, if possible
+# In this case it is only needed for forward mapping, to suppress warnings
+trans2 <- rbind(
+  trans,
+  data.frame(
+    old = "no_cat",
+    new = setdiff(c(occup_new$code), trans$new)
+  )
 )
 
-# additionally add probabilities from knn
+# default only simple frequencies
+occup_simple <- cat2cat(
+  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  mappings = list(trans = trans2, direction = "forward")
+)
+
+# additional probabilities from knn
 occup_ml <- cat2cat(
   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-  mappings = list(trans = trans, direction = "forward"),
+  mappings = list(trans = trans, direction = "backward"),
   ml = list(
     data = occup_old,
     cat_var = "code",

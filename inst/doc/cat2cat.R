@@ -221,7 +221,7 @@ occup_back_2006_2008 <- cat2cat(
 occup_2006_new <- occup_back_2006_2008$old
 occup_2008_new <- occup_back_2008_2010$old # or occup_back_2006_2008$new
 occup_2010_new <- occup_back_2008_2010$new
-occup_2012_new <- dummy_c2c(occup_2012, cat_var = "code", ml = c("wei_knn_c2c"))
+occup_2012_new <- dummy_c2c(occup_2012, cat_var = "code", ml = c("knn"))
 
 final_data_back_ml <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
 

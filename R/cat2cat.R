@@ -1,135 +1,3 @@
-#' Transforming a transition table with mappings to two associative lists
-#' @description to rearrange the one classification encoding into another, an associative list that maps keys to values is used.
-#' More precisely, an association list is used which is a linked list in which each list element consists of a key and value or values.
-#' An association list where unique categories codes are keys and matching categories from next or previous time point are values.
-#' A transition table is used to build such associative lists.
-#' @param x data.frame or matrix - transition table with 2 columns where first column is assumed to be the older encoding.
-#' @details the named list will be a more efficient solution than hash map as we are not expecting more than a few thousand keys.
-#' @return a list with 2 named lists `to_old` and `to_new`.
-#' @examples
-#' data(trans)
-#'
-#' mappings <- get_mappings(trans)
-#' mappings$to_old[1:4]
-#' mappings$to_new[1:4]
-#' @export
-get_mappings <- function(x = data.frame()) {
-  stopifnot(ncol(x) == 2)
-
-  x <- as.matrix(x)
-
-  ff <- x[, 1]
-  ss <- x[, 2]
-
-  from_old <- unique(ff)
-  from_new <- unique(ss)
-
-  to_old <- lapply(from_new, function(i) {
-    tryCatch(
-      unique(ff[ss %in% i]),
-      error = function(e) {
-        NA
-      }
-    )
-  })
-  names(to_old) <- from_new
-
-  to_new <- lapply(from_old, function(i) {
-    tryCatch(
-      unique(ss[ff %in% i]),
-      error = function(e) {
-        NA
-      }
-    )
-  })
-  names(to_new) <- from_old
-
-  list(to_old = to_old, to_new = to_new)
-}
-
-#' Applying frequencies to the object returned by get_mappings function
-#' @description applying frequencies to the object returned by get_mappings.
-#' We will get a symmetric object to returned one by get_mappings function, nevertheless categories are replaced with frequencies.
-#' Frequencies for each category/key are sum to 1, so could be interpreted as probabilities.
-#' @param to_x list object returned by get_mappings.
-#' @param freqs vector object returned by get_freqs.
-#' @return a list with 2 named lists `to_old` and `to_new`.
-#' @examples
-#' data(trans)
-#' data(occup)
-#'
-#' mappings <- get_mappings(trans)
-#'
-#' mappings$to_old[1:4]
-#' mappings$to_new[1:4]
-#'
-#' mapp_p <- cat_apply_freq(
-#'   mappings$to_old,
-#'   get_freqs(
-#'     occup$code[occup$year == "2008"],
-#'     occup$multiplier[occup$year == "2008"]
-#'   )
-#' )
-#' head(data.frame(I(mappings$to_old), I(mapp_p)))
-#' mapp_p <- cat_apply_freq(
-#'   mappings$to_new,
-#'   get_freqs(
-#'     occup$code[occup$year == "2010"],
-#'     occup$multiplier[occup$year == "2010"]
-#'   )
-#' )
-#' head(data.frame(I(mappings$to_new), I(mapp_p)))
-#' @export
-cat_apply_freq <- function(to_x, freqs) {
-  stopifnot(ncol(freqs) == 2)
-  res <- lapply(
-    to_x,
-    function(x) {
-      alls <- freqs[, 2, drop = TRUE][match(x, freqs[, 1, drop = TRUE])]
-      ff <- alls / sum(alls, na.rm = T)
-      # NA to 0
-      ifelse(is.na(ff) | is.nan(ff), 0, ff)
-    }
-  )
-  # all equal to zero so proportional probability
-  res_out <- lapply(
-    res,
-    function(x) {
-      ifelse(rep(all(x == 0), length(x)), 1 / length(x), x)
-    }
-  )
-  names(res_out) <- names(to_x)
-  res_out
-}
-
-#' Getting frequencies from a `character` vector with an optional multiplier argument
-#' @description getting frequencies for a vector with an optional multiplier argument
-#' @param x character vector categorical variable to summarize.
-#' @param multiplier numeric vector how many times to repeat certain value, additional weights.
-#' @return data.frame with two columns `input` `Freq`
-#' @note without multiplier variable it is a basic `table` function wrapped with the `as.data.frame` function.
-#' The `table` function is used with the `useNA = "ifany"` argument.
-#' @export
-#' @examples
-#' data(occup)
-#'
-#' head(get_freqs(occup$code[occup$year == "2008"]))
-#' head(get_freqs(occup$code[occup$year == "2010"]))
-#'
-#' head(get_freqs(occup$code[occup$year == "2008"], occup$multiplier[occup$year == "2008"]))
-#' head(get_freqs(occup$code[occup$year == "2010"], occup$multiplier[occup$year == "2010"]))
-get_freqs <- function(x, multiplier = NULL) {
-  stopifnot(is.null(multiplier) || length(x) == length(multiplier))
-
-  input <- if (!is.null(multiplier)) {
-    rep(x, times = as.numeric(multiplier))
-  } else {
-    x
-  }
-  res <- as.data.frame(table(input, useNA = "ifany"), stringsAsFactors = F)
-  res
-}
-
 #' Automatic mapping of a categorical variable in a panel dataset according to a new encoding
 #' @description This function is built to work for two time points at once.
 #' Thus for more periods some recursion will be needed.
@@ -164,7 +32,7 @@ get_freqs <- function(x, multiplier = NULL) {
 #' optional ml args
 #' \itemize{
 #'  \item{"data"}{ data.frame - dataset with features and the `cat_var`.}
-#'  \item{"cat_var"}{ character - the dependent variable name. It has to be compatible with the `cat_var` in the target period.}
+#'  \item{"cat_var"}{ character - the dependent variable name.}
 #'  \item{"method"}{ character vector - one or a few from "knn", "rf" and "lda" methods - "knn" k-NearestNeighbors, "lda" Linear Discrimination Analysis, "rf" Random Forest }
 #'  \item{"features"}{ character vector of features names where all have to be numeric or logical}
 #'  \item{"args"}{ optional - list parameters: knn: k ; rf: ntree  }
@@ -192,17 +60,27 @@ get_freqs <- function(x, multiplier = NULL) {
 #' occup_old <- occup_small[occup_small$year == 2008, ]
 #' occup_new <- occup_small[occup_small$year == 2010, ]
 #'
-#' # default only simple frequencies
-#'
-#' occup_simple <- cat2cat(
-#'   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-#'   mappings = list(trans = trans, direction = "forward")
+#' # Adding the dummy level to the mapping table for levels without the candidate
+#' # The best to fill them manually with proper candidates, if possible
+#' # In this case it is only needed for forward mapping, to suppress warnings
+#' trans2 <- rbind(
+#'   trans,
+#'   data.frame(
+#'     old = "no_cat",
+#'     new = setdiff(c(occup_new$code), trans$new)
+#'   )
 #' )
 #'
-#' # additionally add probabilities from knn
+#' # default only simple frequencies
+#' occup_simple <- cat2cat(
+#'   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+#'   mappings = list(trans = trans2, direction = "forward")
+#' )
+#'
+#' # additional probabilities from knn
 #' occup_ml <- cat2cat(
 #'   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-#'   mappings = list(trans = trans, direction = "forward"),
+#'   mappings = list(trans = trans, direction = "backward"),
 #'   ml = list(
 #'     data = occup_old,
 #'     cat_var = "code",
@@ -361,7 +239,8 @@ cat2cat <- function(data = list(
     ml_results <- cat2cat_ml(
       ml = ml,
       mapp = mapp,
-      target_data = cat_target_rep
+      target_data = cat_target_rep,
+      cat_var_target = cat_var_target
     )
 
     cat_target_rep <- ml_results$target_data
@@ -379,8 +258,9 @@ cat2cat <- function(data = list(
 #' @param ml `list` the same `ml` argument as provided to `cat2cat` function.
 #' @param mapp `list` a mapping table
 #' @param target_data `data.frame`
+#' @param cat_var_target `character` name of the categorical variable in the target period.
 #' @keywords internal
-cat2cat_ml <- function(ml, mapp, target_data) {
+cat2cat_ml <- function(ml, mapp, target_data, cat_var_target) {
   stopifnot(all(c("method", "features") %in% names(ml)))
   stopifnot(all(ml$features %in% colnames(target_data)))
   stopifnot(all(ml$features %in% colnames(ml$data)))
@@ -388,6 +268,7 @@ cat2cat_ml <- function(ml, mapp, target_data) {
   stopifnot(all(vapply(ml$data[, ml$features, drop = FALSE], function(x) is.numeric(x) || is.logical(x), logical(1))))
   stopifnot(all(ml$method %in% c("knn", "rf", "lda")))
   stopifnot(ml$cat_var %in% colnames(ml$data))
+  stopifnot(cat_var_target %in% colnames(target_data))
 
   features <- unique(ml$features)
   methods <- unique(ml$method)
@@ -396,7 +277,7 @@ cat2cat_ml <- function(ml, mapp, target_data) {
   target_data[, ml_names] <- target_data["wei_freq_c2c"]
 
   cat_ml_year_g <- split(ml$data[, c(features, ml$cat_var), drop = FALSE], factor(ml$data[[ml$cat_var]], exclude = NULL))
-  target_data_cats <- target_data[[ml$cat_var]]
+  target_data_cats <- target_data[[cat_var_target]]
   target_data_cat_c2c <- split(target_data, factor(target_data_cats, exclude = NULL))
 
   for (cat in unique(names(target_data_cat_c2c))) {
@@ -478,165 +359,4 @@ cat2cat_ml <- function(ml, mapp, target_data) {
   target_data <- target_data[order(target_data[["index_c2c"]]), ]
 
   list(target_data = target_data)
-}
-
-#' A set of prune methods which will be useful after transition process
-#'
-#' @description user could specify one from four methods to prune replications
-#'
-#' @param df data.frame
-#' @param index character default wei_freq_c2c
-#' @param column character default index_c2c
-#' @param method character one of four available methods: default "nonzero", "highest", "highest1", "morethan"
-#' @param percent integer from 0 to 99
-#' @return data.frame
-#' @details
-#' method - specify method to reduce number of replications
-#' \itemize{
-#'  \item{"nonzero"}{ remove nonzero probabilities}
-#'  \item{"highest"} { leave only highest probabilities for each subject- accepting ties}
-#'  \item{"highest1"} { leave only highest probabilities for each subject- not accepting ties so always one is returned}
-#'  \item{"morethan"}{ leave rows where a probability is higher than value specify by percent argument }
-#' }
-#' @export
-#' @examples
-#' \dontrun{
-#' data(occup_small)
-#' data(occup)
-#' data(trans)
-#'
-#' occup_old <- occup_small[occup_small$year == 2008, ]
-#' occup_new <- occup_small[occup_small$year == 2010, ]
-#'
-#' occup_ml <- cat2cat(
-#'   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-#'   mappings = list(trans = trans, direction = "backward"),
-#'   ml = list(
-#'     data = occup_new,
-#'     cat_var = "code",
-#'     method = "knn",
-#'     features = c("age", "sex", "edu", "exp", "parttime", "salary"),
-#'     args = list(k = 10)
-#'   )
-#' )
-#'
-#' prune_c2c(occup_ml$old, method = "nonzero")
-#' prune_c2c(occup_ml$old, method = "highest")
-#' prune_c2c(occup_ml$old, method = "highest1")
-#' prune_c2c(occup_ml$old, method = "morethan", percent = 90)
-#'
-#' prune_c2c(occup_ml$old, column = "wei_knn_c2c", method = "nonzero")
-#' }
-#'
-prune_c2c <- function(df, index = "index_c2c", column = "wei_freq_c2c", method = "nonzero", percent = 50) {
-  stopifnot(is.data.frame(df))
-  stopifnot(all(c(index, column) %in% colnames(df)))
-  stopifnot(isTRUE(method %in% c("nonzero", "highest", "highest1", "morethan")))
-  stopifnot(length(percent) == 1 && (percent >= 0 && percent < 100))
-
-  df <- df[order(df[[index]]), ]
-
-  df <- switch(method,
-    nonzero = df[df[[column]] > 0, ],
-    highest1 = df[unlist(tapply(df[[column]], df[[index]], function(x) seq_along(x) == which.max(x))), ],
-    highest = df[unlist(tapply(df[[column]], df[[index]], function(x) x == max(x))), ],
-    morethan = df[df[[column]] > percent / 100, ]
-  )
-  # reweight to still sum to 1 per subject
-  df[[column]] <- unlist(tapply(df[[column]], df[[index]], function(x) x / sum(x)))
-
-  df
-}
-
-#' a function to make a combination of weights from different methods by each row
-#'
-#' @description adding additional column which is a mix of weights columns by each row
-#'
-#' @param df data.frame
-#' @param cols character vector default all columns follow regex like "wei_.*_c2c"
-#' @param weis numeric vector  Default vector the same length as cols and with equally spaced values summing to 1.
-#' @param na.rm logical if NA should be skipped, default TRUE
-#' @return data.frame with an additional column wei_cross_c2c
-#' @export
-#' @examples
-#' \dontrun{
-#' data(occup_small)
-#' data(occup)
-#' data(trans)
-#'
-#' occup_old <- occup_small[occup_small$year == 2008, ]
-#' occup_new <- occup_small[occup_small$year == 2010, ]
-#'
-#' # mix of methods - forward direction, try out backward too
-#' occup_mix <- cat2cat(
-#'   data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
-#'   mappings = list(trans = trans, direction = "backward"),
-#'   ml = list(
-#'     data = occup_new,
-#'     cat_var = "code",
-#'     method = c("knn"),
-#'     features = c("age", "sex", "edu", "exp", "parttime", "salary"),
-#'     args = list(k = 10, ntree = 20)
-#'   )
-#' )
-#' # correlation between ml model
-#' occup_mix_old <- occup_mix$old
-#' cor(occup_mix_old[occup_mix_old$rep_c2c != 1, c("wei_knn_c2c", "wei_freq_c2c")])
-#' # cross all methods and subset one highest probability category for each subject
-#' occup_old_highest1_mix <- prune_c2c(cross_c2c(occup_mix$old),
-#'   column = "wei_cross_c2c", method = "highest1"
-#' )
-#' }
-#'
-cross_c2c <- function(df,
-                      cols = colnames(df)[grepl("^wei_.*_c2c$", colnames(df))],
-                      weis = rep(1 / length(cols), length(cols)),
-                      na.rm = TRUE) {
-  stopifnot(is.data.frame(df))
-  stopifnot(all(cols %in% colnames(df)))
-  stopifnot(length(weis) == length(cols))
-  stopifnot(is.logical(na.rm))
-
-  weis <- weis / sum(weis)
-
-  df[["wei_cross_c2c"]] <- as.vector(rowSums(t(t(as.matrix(df[, cols])) * weis), na.rm = na.rm))
-
-  df
-}
-
-
-#' Add default cat2cat columns to a `data.frame`
-#' @description a utils function to add default cat2cat columns to a `data.frame`.
-#' It will be useful e.g. for a boarder periods which will not have additional `cat2cat` columns.
-#' @param df `data.frame`
-#' @param cat_var `character` a categorical variable name.
-#' @param ml `character` vector of ml models applied, any of `c("wei_knn_c2c", "wei_rf_c2c", "wei_lda_c2c")`.
-#' @export
-#' @examples
-#' \dontrun{
-#' dummy_c2c(airquality, "Month")
-#'
-#' data(occup_small)#'
-#' occup_old <- occup_small[occup_small$year == 2008, ]
-#' dummy_c2c(occup_old, "code")
-#' }
-dummy_c2c <- function(df, cat_var, ml = NULL) {
-  stopifnot(is.data.frame(df))
-  stopifnot(length(cat_var) == 1 && is.character(cat_var))
-  stopifnot(isTRUE(cat_var %in% colnames(df)))
-  stopifnot(is.null(ml) || all(ml %in% c("wei_knn_c2c", "wei_rf_c2c", "wei_lda_c2c")))
-
-  if (!all(c("index_c2c", "g_new_c2c", "wei_freq_c2c", "rep_c2c", "wei_naive_c2c") %in% colnames(df))) {
-    df$index_c2c <- seq_len(nrow(df))
-    df$g_new_c2c <- df[[cat_var]]
-    df$wei_freq_c2c <- 1
-    df$rep_c2c <- 1
-    df$wei_naive_c2c <- 1
-  }
-
-  if (!is.null(ml)) {
-    df[, setdiff(ml, colnames(df))] <- 1
-  }
-
-  df
 }
