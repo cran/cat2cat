@@ -1,3 +1,17 @@
+# cat2cat 0.4.4
+
+* Fix example in the `cat2cat` function.
+* Improve documentation.
+* Improve validation.
+
+# cat2cat 0.4.3
+
+* Fix `dummy_c2c` to be backward compatible.
+* Add more tests for base utils functions.
+* Improve `cat_apply_freq` function performance.
+* Improve documentation.
+* Improve validation.
+
 # cat2cat 0.4.2
 
 * The `ml` argument in the `dummy_c2c` function is redefined, shorter names for a simpler usage.

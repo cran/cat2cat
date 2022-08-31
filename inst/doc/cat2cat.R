@@ -11,12 +11,9 @@ library(dplyr)
 data(occup)
 data(trans)
 
-occup_old <- occup[occup$year == 2008, ]
-occup_new <- occup[occup$year == 2010, ]
-
 occup_2006 <- occup[occup$year == 2006, ]
-occup_2008 <- occup[occup$year == 2008, ]
-occup_2010 <- occup[occup$year == 2010, ]
+occup_2008 <- occup_old <- occup[occup$year == 2008, ]
+occup_2010 <- occup_new <- occup[occup$year == 2010, ]
 occup_2012 <- occup[occup$year == 2012, ]
 
 ## -----------------------------------------------------------------------------
@@ -306,7 +303,6 @@ agg_new <- verticals[verticals$v_date == "2020-05-01", ]
 
 ## cat2cat_agg - could map in both directions at once although
 ## usually we want to have old or new representation
-
 agg <- cat2cat_agg(
   data = list(
     old = agg_old,
@@ -321,14 +317,14 @@ agg <- cat2cat_agg(
 )
 
 ## possible processing
-
-agg$old %>%
-  group_by(vertical) %>%
-  summarise(sales = sum(sales * prop_c2c), counts = sum(counts * prop_c2c), v_date = first(v_date))
-
-agg$new %>%
-  group_by(vertical) %>%
-  summarise(sales = sum(sales * prop_c2c), counts = sum(counts * prop_c2c), v_date = first(v_date))
+library(dplyr)
+agg %>%
+    bind_rows() %>%
+    group_by(v_date, vertical) %>%
+    summarise(sales = sum(sales * prop_c2c),
+              counts = sum(counts * prop_c2c),
+              v_date = first(v_date), 
+              .groups = "drop")
 
 ## -----------------------------------------------------------------------------
 library(cat2cat)
@@ -338,14 +334,13 @@ data(verticals2)
 vert_old <- verticals2[verticals2$v_date == "2020-04-01", ]
 vert_new <- verticals2[verticals2$v_date == "2020-05-01", ]
 
-## get transitions table
+## get mapping (transition) table
 trans_v <- vert_old %>%
   inner_join(vert_new, by = "ean") %>%
   select(vertical.x, vertical.y) %>%
   distinct()
 
 ## -----------------------------------------------------------------------------
-#
 ## cat2cat
 ## it is important to set id_var as then we merging categories 1 to 1
 ## for this identifier which exists in both periods.

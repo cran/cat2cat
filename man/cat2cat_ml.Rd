@@ -2,7 +2,7 @@
 % Please edit documentation in R/cat2cat.R
 \name{cat2cat_ml}
 \alias{cat2cat_ml}
-\title{The internal function used in the cat2cat ones}
+\title{The internal function used in the cat2cat one}
 \usage{
 cat2cat_ml(ml, mapp, target_data, cat_var_target)
 }
@@ -13,7 +13,7 @@ cat2cat_ml(ml, mapp, target_data, cat_var_target)
 
 \item{target_data}{`data.frame`}
 
-\item{cat_var_target}{`character` name of the categorical variable in the target period.}
+\item{cat_var_target}{`character(1)` name of the categorical variable in the target period.}
 }
 \description{
 apply the ml models to the cat2cat data
