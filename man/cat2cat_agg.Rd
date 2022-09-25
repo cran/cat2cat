@@ -10,15 +10,18 @@ cat2cat_agg(
 )
 }
 \arguments{
-\item{data}{list with 5 named fields `old`, `new`, `cat_var`, `time_var`, `freq_var`.}
+\item{data}{list with 5 named fields
+`old`, `new`, `cat_var`, `time_var`, `freq_var`.}
 
-\item{...}{mapping equations where direction is set with any of `>`, `<`, `\%>\%`, `\%<\%`.}
+\item{...}{mapping equations where direction is set with any of,
+`>`, `<`, `\%>\%`, `\%<\%`.}
 }
 \value{
 `list` of two data.frame objects.
 }
 \description{
-Manual mapping of an inconsistently coded categorical variable according to the user provided mappings (equations).
+Manual mapping of an inconsistently coded categorical variable
+according to the user provided mappings (equations).
 }
 \details{
 data argument - list with fields
@@ -31,7 +34,7 @@ data argument - list with fields
 }
 }
 \examples{
-data(verticals)
+data("verticals", package = "cat2cat")
 agg_old <- verticals[verticals$v_date == "2020-04-01", ]
 agg_new <- verticals[verticals$v_date == "2020-05-01", ]
 
@@ -52,7 +55,7 @@ agg <- cat2cat_agg(
 )
 
 ## possible processing
-library(dplyr)
+library("dplyr")
 agg \%>\%
   bind_rows() \%>\%
   group_by(v_date, vertical) \%>\%

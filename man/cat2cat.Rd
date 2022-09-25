@@ -6,36 +6,45 @@
 \usage{
 cat2cat(
   data = list(old = NULL, new = NULL, time_var = NULL, cat_var = NULL, cat_var_old =
-    NULL, cat_var_new = NULL, id_var = NULL, multiplier_var = NULL, freqs_df = NULL),
-  mappings = list(trans = NULL, direction = NULL),
+    NULL, cat_var_new = NULL, id_var = NULL, multiplier_var = NULL),
+  mappings = list(trans = NULL, direction = NULL, freqs_df = NULL),
   ml = list(data = NULL, cat_var = NULL, method = NULL, features = NULL, args = NULL)
 )
 }
 \arguments{
-\item{data}{`named list` with fields `old`, `new`, `cat_var` (or `cat_var_old` and `cat_var_new`), `time_var` and optional `id_var`,`multiplier_var`.}
+\item{data}{`named list` with fields `old`, `new`,
+`cat_var` (or `cat_var_old` and `cat_var_new`), `time_var` and
+optional `id_var`,`multiplier_var`.}
 
-\item{mappings}{`named list` with 3 fields `trans`, `direction` and optional `freq_df`.}
+\item{mappings}{`named list` with 3 fields `trans`, `direction` and
+optional `freqs_df`.}
 
-\item{ml}{`named list` (optional) with up to 5 fields `data`, `cat_var`, `method`, `features` and optional `args`.}
+\item{ml}{`named list` (optional) with up to 5 fields
+`data`, `cat_var`, `method`, `features` and optional `args`.}
 }
 \value{
 `named list` with 2 fields old and new - 2 data.frames.
-There will be added additional columns like index_c2c, g_new_c2c, wei_freq_c2c, rep_c2c, wei_(ml method name)_c2c.
-Additional columns will be informative only for a one data.frame as we always make the changes to one direction.
+There will be added additional columns like
+index_c2c, g_new_c2c, wei_freq_c2c, rep_c2c, wei_(ml method name)_c2c.
+Additional columns will be informative only for a one data.frame
+as we always make the changes to one direction.
 }
 \description{
-The objective is to unify an inconsistently coded categorical variable in a panel
-dataset according to a mapping (transition) table.
+The objective is to unify an inconsistently coded categorical variable
+in a panel dataset according to a mapping (transition) table.
 The mapping (transition) table is the core element of the process.
 There are three arguments `data`, `mappings`, and `ml`. Each
 of these arguments is of a `list` type, wherein the
 `ml` argument is optional. Arguments are separated to
-identify the core elements of the `cat2cat` procedure. Although this function seems
+identify the core elements of the `cat2cat` procedure.
+Although this function seems
 complex initially, it is built to offer a wide range of
 applications for complex tasks. The function contains
 many validation checks to prevent incorrect usage.
-The function has to be applied iteratively for each two neighboring periods of a panel dataset.
-The \code{prune_c2c} function could be needed to limit growing number of replications.
+The function has to be applied iteratively for each two neighboring periods
+of a panel dataset.
+The \code{prune_c2c} function could be needed to limit growing number
+of replications.
 }
 \details{
 data args
@@ -44,31 +53,59 @@ data args
  \item{"new"} { data.frame more recent time point in a panel}
  \item{"time_var"}{ character(1) name of the time variable.}
  \item{"cat_var"}{ character(1) name of the categorical variable.}
- \item{"cat_var_old"}{ Optional character(1) name of the categorical variable in the older time point. Default `cat_var`.}
- \item{"cat_var_new"}{ Optional character(1) name of the categorical variable in the newer time point. Default `cat_var`.}
- \item{"id_var"}{ Optional character(1) name of the unique identifier variable - if this is specified then for subjects observe in both periods the direct mapping is applied.}
- \item{"multiplier_var"}{ Optional character(1) name of the multiplier variable - number of replication needed to reproduce the population}
- \item{"freqs_df"}{ For backward compaibility check the definition in the description. of the mappings argument }
+ \item{"cat_var_old"}{
+ Optional character(1) name of the categorical variable
+ in the older time point. Default `cat_var`.
+ }
+ \item{"cat_var_new"}{
+ Optional character(1) name of the categorical variable
+ in the newer time point. Default `cat_var`.
+ }
+ \item{"id_var"}{Optional character(1) name of the unique identifier variable
+  - if this is specified then for subjects observed in both periods,
+ the direct mapping is applied.
+ }
+ \item{"multiplier_var"}{
+ Optional character(1) name of the multiplier variable -
+ number of replication needed to reproduce the population
+ }
+ \item{"freqs_df"}{
+ Only for the backward compatibility check the definition in the description
+ of the mappings argument
+ }
 }
 mappings args
 \itemize{
- \item{"trans"}{ data.frame with 2 columns - mapping (transition) table - all categories for cat_var in old and new datasets have to be included.
+ \item{"trans"}{ data.frame with 2 columns - mapping (transition) table -
+  all categories for cat_var in old and new datasets have to be included.
   First column contains an old encoding and second a new one.
-  The mapping (transition) table should to have a candidate for each category from the targeted for an update period.
+  The mapping (transition) table should to have a candidate for each category
+  from the targeted for an update period.
 }
  \item{"direction"}{ character(1) direction - "backward" or "forward"}
- \item{"freqs_df"}{ Optional - data.frame with 2 columns where first one is category name (base period) and second counts.
+ \item{"freqs_df"}{
+ Optional - data.frame with 2 columns where first one
+ is category name (base period) and second counts.
  If It is not provided then is assessed automatically.
  Artificial counts for each variable level in the base period.
  It is optional nevertheless will be often needed, as gives more control.
- It will be used to assess the probabilities. The multiplier variable is omitted so sb has to apply it in this table.}
+ It will be used to assess the probabilities.
+ The multiplier variable is omitted so sb has to apply it in this table.
+ }
 }
 Optional ml args
 \itemize{
  \item{"data"}{ data.frame - dataset with features and the `cat_var`.}
  \item{"cat_var"}{ character(1) - the dependent variable name.}
- \item{"method"}{ character vector - one or a few from "knn", "rf" and "lda" methods - "knn" k-NearestNeighbors, "lda" Linear Discrimination Analysis, "rf" Random Forest }
- \item{"features"}{ character vector of features names where all have to be numeric or logical}
+ \item{"method"}{
+ character vector - one or a few from
+ "knn", "rf" and "lda" methods - "knn" k-NearestNeighbors,
+ "lda" Linear Discrimination Analysis, "rf" Random Forest
+ }
+ \item{"features"}{
+ character vector of features names where all
+ have to be numeric or logical
+ }
  \item{"args"}{ optional - list parameters: knn: k ; rf: ntree  }
 }
 
@@ -78,21 +115,23 @@ When ml model is broken then weights from simple frequencies are taken.
 }
 \note{
 `trans` arg columns and the `cat_var` column have to be of the same type.
-The mapping (transition) table should to have a candidate for each category from the targeted for an update period.
-The observation from targeted for an updated period without a matched category from base period is removed.
+The mapping (transition) table should to have a candidate for each category
+from the targeted for an update period.
+The observation from targeted for an updated period without a matched
+category from base period is removed.
 If you want to leave NA values add `c(NA, NA)` row to the `trans` table.
 Please check the vignette for more information.
 }
 \examples{
 \dontrun{
-data(occup_small)
-data(occup)
-data(trans)
+data("occup_small", package = "cat2cat")
+data("occup", package = "cat2cat")
+data("trans", package = "cat2cat")
 
 occup_old <- occup_small[occup_small$year == 2008, ]
 occup_new <- occup_small[occup_small$year == 2010, ]
 
-# Adding the dummy level to the mapping table for levels without the candidate
+# Adding the dummy level to the mapping table for levels without a candidate
 # The best to fill them manually with proper candidates, if possible
 # In this case it is only needed for forward mapping, to suppress warnings
 trans2 <- rbind(
@@ -105,13 +144,17 @@ trans2 <- rbind(
 
 # default only simple frequencies
 occup_simple <- cat2cat(
-  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans2, direction = "forward")
 )
 
 # additional probabilities from knn
 occup_ml <- cat2cat(
-  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
     data = occup_small[occup_small$year >= 2010, ],

@@ -68,11 +68,11 @@ The original survey is anonymous and take place **every two years**.
 `trans` mapping (transition) table contains mappings between old (2008) and new (2010) occupational codes. This table could be used to map encodings in both directions.
 
 ```{r, message=FALSE, warning=FALSE}
-library(cat2cat)
-library(dplyr)
+library("cat2cat")
+library("dplyr")
 
-data(occup)
-data(trans)
+data("occup", package = "cat2cat")
+data("trans", package = "cat2cat")
 
 occup_2006 <- occup[occup$year == 2006, ]
 occup_2008 <- occup_old <- occup[occup$year == 2008, ]
@@ -94,15 +94,19 @@ These graphs present how the `cat2cat::cat2cat` procedure works, in this case un
 ```{r}
 ## cat2cat
 occup_simple <- cat2cat(
-  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans, direction = "backward")
 )
 
 ## with informative features it might be usefull to run ml algorithm
-## currently only knn, lda or rf (randomForest),  a few methods could be specified at once
+## currently knn, lda and rf (randomForest), could be a few at once
 ## where probability will be assessed as fraction of closest points.
 occup_2 <- cat2cat(
-  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
     data = occup_new,
@@ -126,7 +130,9 @@ Example for the 2 period panel dataset.
 ```{r}
 # mix of methods
 occup_2_mix <- cat2cat(
-  data = list(old = occup_old, new = occup_new, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
     data = occup_new,
@@ -174,13 +180,15 @@ Unification Process:
 ```{r}
 # 2010 -> 2008
 occup_back_2008_2010 <- cat2cat(
-  data = list(old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans, direction = "backward")
 )
 
 # optional, give more control
 # the counts could be any of wei_* or their combination
-freq_df <- occup_back_2008_2010$old[, c("g_new_c2c", "wei_freq_c2c")] %>%
+freqs_df <- occup_back_2008_2010$old[, c("g_new_c2c", "wei_freq_c2c")] %>%
   group_by(g_new_c2c) %>%
   summarise(counts = round(sum(wei_freq_c2c)))
 
@@ -191,10 +199,9 @@ occup_back_2006_2008 <- cat2cat(
     new = occup_back_2008_2010$old,
     cat_var_new = "g_new_c2c",
     cat_var_old = "code",
-    time_var = "year",
-    freqs_df = freq_df
+    time_var = "year"
   ),
-  mappings = list(trans = trans, direction = "backward")
+  mappings = list(trans = trans, direction = "backward", freqs_df = freqs_df)
 )
 
 occup_2006_new <- occup_back_2006_2008$old
@@ -203,7 +210,10 @@ occup_2010_new <- occup_back_2008_2010$new
 # use ml argument when applied ml models
 occup_2012_new <- dummy_c2c(occup_2012, "code")
 
-final_data_back <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
+final_data_back <- do.call(
+  rbind, 
+  list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)
+)
 ```
 
 Valiation of global counts and per variable level counts:
@@ -239,8 +249,11 @@ A few categories levels are not in the trans table, lacking levels `setdiff(c(oc
 We could solve it by adding a "no_cat" level for each of them in the `trans` table.
 
 ```{r}
-trans2 <- rbind(trans, data.frame(old = "no_cat",
-                                  new = setdiff(c(occup_2010$code, occup_2012$code), trans$new)))
+trans2 <- rbind(trans, 
+                data.frame(
+                  old = "no_cat",
+                  new = setdiff(c(occup_2010$code, occup_2012$code), trans$new)
+                ))
 ```
 
 Of course the best solution will be to get these mappings from the data provider
@@ -248,13 +261,15 @@ Of course the best solution will be to get these mappings from the data provider
 ```{r}
 # 2008 -> 2010
 occup_for_2008_2010 <- cat2cat(
-  data = list(old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans2, direction = "forward")
 )
 
 # optional, give more control
 # the counts could be any of wei_* or their combination
-freq_df <- occup_for_2008_2010$new[, c("g_new_c2c", "wei_freq_c2c")] %>%
+freqs_df <- occup_for_2008_2010$new[, c("g_new_c2c", "wei_freq_c2c")] %>%
   group_by(g_new_c2c) %>%
   summarise(counts = round(sum(wei_freq_c2c)))
 
@@ -265,10 +280,9 @@ occup_for_2010_2012 <- cat2cat(
     new = occup_2012,
     cat_var_old = "g_new_c2c",
     cat_var_new = "code",
-    time_var = "year",
-    freqs_df = freq_df
+    time_var = "year"
   ),
-  mappings = list(trans = trans2, direction = "forward")
+  mappings = list(trans = trans2, direction = "forward", freqs_df = freqs_df)
 )
 
 # use ml argument when applied ml models
@@ -277,7 +291,10 @@ occup_2008_new <- occup_for_2008_2010$old
 occup_2010_new <- occup_for_2008_2010$new # or occup_for_2010_2012$old
 occup_2012_new <- occup_for_2010_2012$new
 
-final_data_for <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
+final_data_for <- do.call(
+  rbind, 
+  list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)
+)
 ```
 
 Valiation of global counts and per variable level counts.
@@ -312,7 +329,9 @@ Unification Process:
 ```{r}
 # 2010 -> 2008
 occup_back_2008_2010 <- cat2cat(
-  data = list(old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"),
+  data = list(
+    old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"
+  ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
     data = dplyr::bind_rows(occup_2010, occup_2012),
@@ -347,7 +366,10 @@ occup_2008_new <- occup_back_2008_2010$old # or occup_back_2006_2008$new
 occup_2010_new <- occup_back_2008_2010$new
 occup_2012_new <- dummy_c2c(occup_2012, cat_var = "code", ml = c("knn"))
 
-final_data_back_ml <- do.call(rbind, list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))
+final_data_back_ml <- do.call(
+  rbind, 
+  list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)
+)
 ```
 
 Valiation of global counts and per variable level counts.
@@ -403,22 +425,32 @@ The next 3 regressions have the same results.
 
 ```{r}
 ## orginal dataset
-lms2 <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old, weights = multiplier)
+lms2 <- lm(
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old,
+  weights = multiplier
+)
 summary(lms2)
 
 ## using one highest cross weights
 ## cross_c2c to cross differen methods weights
-## prune_c2c - highest1 leave only one the highest probability obs for each subject
+## prune_c2c
+## highest1 leave only one the highest probability obs for each subject
 occup_old_2 <- occup_2$old %>%
   cross_c2c(., c("wei_freq_c2c", "wei_knn_c2c"), c(1 / 2, 1 / 2)) %>%
   prune_c2c(., column = "wei_cross_c2c", method = "highest1")
-lms <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_2, weights = multiplier)
+lms <- lm(
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_2,
+  weights = multiplier
+)
 summary(lms)
 
 ## we have to adjust size of stds as we artificialy enlarge degrees of freedom
 occup_old_3 <- occup_2$old %>%
   prune_c2c(method = "nonzero") # many prune methods like highest
-lms_replicated <- lm(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3, weights = multiplier * wei_freq_c2c)
+lms_replicated <- lm(
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3,
+  weights = multiplier * wei_freq_c2c
+)
 # Adjusted R2 is meaningless here
 lms_replicated$df.residual <- nrow(occup_old) - length(lms_replicated$assign)
 suppressWarnings(summary(lms_replicated))
@@ -430,10 +462,13 @@ Example regression model with usage of the unified variable (`g_new_c2c`).
 A separate model for each occupational group.
 
 ```{r}
-formula_oo <- formula(I(log(salary)) ~ age + sex + factor(edu) + parttime + exp + factor(year))
+formula_oo <- formula(
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp + factor(year)
+)
 oo <- final_data_back %>%
   prune_c2c(method = "nonzero") %>% # many prune methods like highest
   group_by(g_new_c2c) %>%
+  filter(n() >= 15) %>% 
   do(
     lm = tryCatch(
       summary(lm(formula_oo, ., weights = multiplier * wei_freq_c2c)),
@@ -452,8 +487,8 @@ oo$lm[[2]]
 `cat2cat_agg` is mainly useful for aggregate datasets.
 
 ```{r}
-library(cat2cat)
-data(verticals)
+library("cat2cat")
+data("verticals", package = "cat2cat")
 
 agg_old <- verticals[verticals$v_date == "2020-04-01", ]
 agg_new <- verticals[verticals$v_date == "2020-05-01", ]
@@ -474,7 +509,7 @@ agg <- cat2cat_agg(
 )
 
 ## possible processing
-library(dplyr)
+library("dplyr")
 agg %>%
     bind_rows() %>%
     group_by(v_date, vertical) %>%
@@ -492,7 +527,7 @@ Unfortunately we have to assume that a subject could not change the category lev
 ```{r}
 library(cat2cat)
 ## the ean variable is a unique identifier
-data(verticals2)
+data("verticals2", package = "cat2cat")
 
 vert_old <- verticals2[verticals2$v_date == "2020-04-01", ]
 vert_new <- verticals2[verticals2$v_date == "2020-05-01", ]
@@ -509,7 +544,8 @@ trans_v <- vert_old %>%
 ## it is important to set id_var as then we merging categories 1 to 1
 ## for this identifier which exists in both periods.
 verts <- cat2cat(
-  data = list(old = vert_old, new = vert_new, id_var = "ean", cat_var = "vertical", time_var = "v_date"),
+  data = list(old = vert_old, new = vert_new, id_var = "ean",
+              cat_var = "vertical", time_var = "v_date"),
   mappings = list(trans = trans_v, direction = "backward")
 )
 ```

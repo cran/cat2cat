@@ -11,7 +11,7 @@
 
 <meta name="author" content="Maciej Nasinski" />
 
-<meta name="date" content="2022-08-31" />
+<meta name="date" content="2022-09-25" />
 
 <title>Get Started</title>
 
@@ -1605,7 +1605,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Get Started</h1>
 <h4 class="author">Maciej Nasinski</h4>
-<h4 class="date">2022-08-31</h4>
+<h4 class="date">2022-09-25</h4>
 
 </div>
 
@@ -1681,11 +1681,11 @@ survey is anonymous and take place <strong>every two years</strong>.</p>
 <p><code>trans</code> mapping (transition) table contains mappings
 between old (2008) and new (2010) occupational codes. This table could
 be used to map encodings in both directions.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cat2cat)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cat2cat&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(occup)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(trans)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;occup&quot;</span>, <span class="at">package =</span> <span class="st">&quot;cat2cat&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;trans&quot;</span>, <span class="at">package =</span> <span class="st">&quot;cat2cat&quot;</span>)</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>occup_2006 <span class="ot">&lt;-</span> occup[occup<span class="sc">$</span>year <span class="sc">==</span> <span class="dv">2006</span>, ]</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>occup_2008 <span class="ot">&lt;-</span> occup_old <span class="ot">&lt;-</span> occup[occup<span class="sc">$</span>year <span class="sc">==</span> <span class="dv">2008</span>, ]</span>
@@ -1710,24 +1710,28 @@ and only two periods.</p>
 <h3>Example - 2 periods</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## cat2cat</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>occup_simple <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> occup_old, <span class="at">new =</span> occup_new, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="do">## with informative features it might be usefull to run ml algorithm</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="do">## currently only knn, lda or rf (randomForest),  a few methods could be specified at once</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="do">## where probability will be assessed as fraction of closest points.</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>occup_2 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> occup_old, <span class="at">new =</span> occup_new, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> occup_new,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;knn&quot;</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>)</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_old, <span class="at">new =</span> occup_new, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="do">## with informative features it might be usefull to run ml algorithm</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="do">## currently knn, lda and rf (randomForest), could be a few at once</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="do">## where probability will be assessed as fraction of closest points.</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>occup_2 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_old, <span class="at">new =</span> occup_new, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> occup_new,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;knn&quot;</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>plot_c2c</code> offers a summary of the replication
 process.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># summary_plot</span></span>
@@ -1736,20 +1740,22 @@ process.</p>
 <p>Example for the 2 period panel dataset.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># mix of methods</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>occup_2_mix <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> occup_old, <span class="at">new =</span> occup_new, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> occup_new,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>, <span class="st">&quot;rf&quot;</span>, <span class="st">&quot;lda&quot;</span>),</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">ntree =</span> <span class="dv">50</span>)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># cross all methods and subset one highest probability category for each subject</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>occup_old_mix_highest1 <span class="ot">&lt;-</span> occup_2_mix<span class="sc">$</span>old <span class="sc">%&gt;%</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_c2c</span>(.) <span class="sc">%&gt;%</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(., <span class="at">column =</span> <span class="st">&quot;wei_cross_c2c&quot;</span>, <span class="at">method =</span> <span class="st">&quot;highest1&quot;</span>)</span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_old, <span class="at">new =</span> occup_new, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> occup_new,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>, <span class="st">&quot;rf&quot;</span>, <span class="st">&quot;lda&quot;</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>, <span class="at">ntree =</span> <span class="dv">50</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># cross all methods and subset one highest probability category for each subject</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>occup_old_mix_highest1 <span class="ot">&lt;-</span> occup_2_mix<span class="sc">$</span>old <span class="sc">%&gt;%</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_c2c</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(., <span class="at">column =</span> <span class="st">&quot;wei_cross_c2c&quot;</span>, <span class="at">method =</span> <span class="st">&quot;highest1&quot;</span>)</span></code></pre></div>
 <p>Correlations between different methods of assesing weights are
 presented.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># correlation between ml models and simple fequencies</span></span>
@@ -1757,10 +1763,10 @@ presented.</p>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(wei_knn_c2c, wei_rf_c2c, wei_lda_c2c, wei_freq_c2c) <span class="sc">%&gt;%</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span></code></pre></div>
 <pre><code>##              wei_knn_c2c wei_rf_c2c wei_lda_c2c wei_freq_c2c
-## wei_knn_c2c    1.0000000  0.8646128   0.8350984    0.8989887
-## wei_rf_c2c     0.8646128  1.0000000   0.8777527    0.8751290
-## wei_lda_c2c    0.8350984  0.8777527   1.0000000    0.8807702
-## wei_freq_c2c   0.8989887  0.8751290   0.8807702    1.0000000</code></pre>
+## wei_knn_c2c    1.0000000  0.8644004   0.8350984    0.8989887
+## wei_rf_c2c     0.8644004  1.0000000   0.8782080    0.8748934
+## wei_lda_c2c    0.8350984  0.8782080   1.0000000    0.8807702
+## wei_freq_c2c   0.8989887  0.8748934   0.8807702    1.0000000</code></pre>
 </div>
 <div id="example---more-than-2-periods" class="section level3">
 <h3>Example - More than 2 periods</h3>
@@ -1782,36 +1788,40 @@ observations.</p>
 <p>Unification Process:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2010 -&gt; 2008</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>occup_back_2008_2010 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> occup_2008, <span class="at">new =</span> occup_2010, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># optional, give more control</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># the counts could be any of wei_* or their combination</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>freq_df <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>old[, <span class="fu">c</span>(<span class="st">&quot;g_new_c2c&quot;</span>, <span class="st">&quot;wei_freq_c2c&quot;</span>)] <span class="sc">%&gt;%</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(g_new_c2c) <span class="sc">%&gt;%</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">counts =</span> <span class="fu">round</span>(<span class="fu">sum</span>(wei_freq_c2c)))</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2008 -&gt; 2006</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>occup_back_2006_2008 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2006,</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> occup_back_2008_2010<span class="sc">$</span>old,</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_new =</span> <span class="st">&quot;g_new_c2c&quot;</span>,</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_old =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>,</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">freqs_df =</span> freq_df</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>occup_2006_new <span class="ot">&lt;-</span> occup_back_2006_2008<span class="sc">$</span>old</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>occup_2008_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>old <span class="co"># or occup_back_2006_2008$new</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>occup_2010_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>new</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co"># use ml argument when applied ml models</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>occup_2012_new <span class="ot">&lt;-</span> <span class="fu">dummy_c2c</span>(occup_2012, <span class="st">&quot;code&quot;</span>)</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>final_data_back <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">list</span>(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))</span></code></pre></div>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2008, <span class="at">new =</span> occup_2010, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># optional, give more control</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># the counts could be any of wei_* or their combination</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>freqs_df <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>old[, <span class="fu">c</span>(<span class="st">&quot;g_new_c2c&quot;</span>, <span class="st">&quot;wei_freq_c2c&quot;</span>)] <span class="sc">%&gt;%</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(g_new_c2c) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">counts =</span> <span class="fu">round</span>(<span class="fu">sum</span>(wei_freq_c2c)))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 2008 -&gt; 2006</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>occup_back_2006_2008 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2006,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> occup_back_2008_2010<span class="sc">$</span>old,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_new =</span> <span class="st">&quot;g_new_c2c&quot;</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_old =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>, <span class="at">freqs_df =</span> freqs_df)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>occup_2006_new <span class="ot">&lt;-</span> occup_back_2006_2008<span class="sc">$</span>old</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>occup_2008_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>old <span class="co"># or occup_back_2006_2008$new</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>occup_2010_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>new</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co"># use ml argument when applied ml models</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>occup_2012_new <span class="ot">&lt;-</span> <span class="fu">dummy_c2c</span>(occup_2012, <span class="st">&quot;code&quot;</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>final_data_back <span class="ot">&lt;-</span> <span class="fu">do.call</span>(</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  rbind, </span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Valiation of global counts and per variable level counts:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We persist the number of observations</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>counts_new <span class="ot">&lt;-</span> final_data_back <span class="sc">%&gt;%</span></span>
@@ -1841,42 +1851,49 @@ observations.</p>
 <code>setdiff(c(occup_2010$code, occup_2012$code), trans$new)</code>. We
 could solve it by adding a “no_cat” level for each of them in the
 <code>trans</code> table.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>trans2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(trans, <span class="fu">data.frame</span>(<span class="at">old =</span> <span class="st">&quot;no_cat&quot;</span>,</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">new =</span> <span class="fu">setdiff</span>(<span class="fu">c</span>(occup_2010<span class="sc">$</span>code, occup_2012<span class="sc">$</span>code), trans<span class="sc">$</span>new)))</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>trans2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(trans, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                <span class="fu">data.frame</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">old =</span> <span class="st">&quot;no_cat&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">new =</span> <span class="fu">setdiff</span>(<span class="fu">c</span>(occup_2010<span class="sc">$</span>code, occup_2012<span class="sc">$</span>code), trans<span class="sc">$</span>new)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                ))</span></code></pre></div>
 <p>Of course the best solution will be to get these mappings from the
 data provider</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2008 -&gt; 2010</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>occup_for_2008_2010 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> occup_2008, <span class="at">new =</span> occup_2010, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans2, <span class="at">direction =</span> <span class="st">&quot;forward&quot;</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># optional, give more control</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># the counts could be any of wei_* or their combination</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>freq_df <span class="ot">&lt;-</span> occup_for_2008_2010<span class="sc">$</span>new[, <span class="fu">c</span>(<span class="st">&quot;g_new_c2c&quot;</span>, <span class="st">&quot;wei_freq_c2c&quot;</span>)] <span class="sc">%&gt;%</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(g_new_c2c) <span class="sc">%&gt;%</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">counts =</span> <span class="fu">round</span>(<span class="fu">sum</span>(wei_freq_c2c)))</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2010 -&gt; 2012</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>occup_for_2010_2012 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_for_2008_2010<span class="sc">$</span>new,</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> occup_2012,</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_old =</span> <span class="st">&quot;g_new_c2c&quot;</span>,</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_new =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>,</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">freqs_df =</span> freq_df</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans2, <span class="at">direction =</span> <span class="st">&quot;forward&quot;</span>)</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="co"># use ml argument when applied ml models</span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>occup_2006_new <span class="ot">&lt;-</span> <span class="fu">dummy_c2c</span>(occup_2006, <span class="st">&quot;code&quot;</span>)</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>occup_2008_new <span class="ot">&lt;-</span> occup_for_2008_2010<span class="sc">$</span>old</span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>occup_2010_new <span class="ot">&lt;-</span> occup_for_2008_2010<span class="sc">$</span>new <span class="co"># or occup_for_2010_2012$old</span></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>occup_2012_new <span class="ot">&lt;-</span> occup_for_2010_2012<span class="sc">$</span>new</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>final_data_for <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">list</span>(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))</span></code></pre></div>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2008, <span class="at">new =</span> occup_2010, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans2, <span class="at">direction =</span> <span class="st">&quot;forward&quot;</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co"># optional, give more control</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># the counts could be any of wei_* or their combination</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>freqs_df <span class="ot">&lt;-</span> occup_for_2008_2010<span class="sc">$</span>new[, <span class="fu">c</span>(<span class="st">&quot;g_new_c2c&quot;</span>, <span class="st">&quot;wei_freq_c2c&quot;</span>)] <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(g_new_c2c) <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">counts =</span> <span class="fu">round</span>(<span class="fu">sum</span>(wei_freq_c2c)))</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 2010 -&gt; 2012</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>occup_for_2010_2012 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_for_2008_2010<span class="sc">$</span>new,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> occup_2012,</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_old =</span> <span class="st">&quot;g_new_c2c&quot;</span>,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_new =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans2, <span class="at">direction =</span> <span class="st">&quot;forward&quot;</span>, <span class="at">freqs_df =</span> freqs_df)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="co"># use ml argument when applied ml models</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>occup_2006_new <span class="ot">&lt;-</span> <span class="fu">dummy_c2c</span>(occup_2006, <span class="st">&quot;code&quot;</span>)</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>occup_2008_new <span class="ot">&lt;-</span> occup_for_2008_2010<span class="sc">$</span>old</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>occup_2010_new <span class="ot">&lt;-</span> occup_for_2008_2010<span class="sc">$</span>new <span class="co"># or occup_for_2010_2012$old</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>occup_2012_new <span class="ot">&lt;-</span> occup_for_2010_2012<span class="sc">$</span>new</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>final_data_for <span class="ot">&lt;-</span> <span class="fu">do.call</span>(</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>  rbind, </span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Valiation of global counts and per variable level counts.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We persist the number of observations</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>counts_new <span class="ot">&lt;-</span> final_data_for <span class="sc">%&gt;%</span></span>
@@ -1904,42 +1921,47 @@ data provider</p>
 <p>Unification Process:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2010 -&gt; 2008</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>occup_back_2008_2010 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> occup_2008, <span class="at">new =</span> occup_2010, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(occup_2010, occup_2012),</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>),</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>)</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2008 -&gt; 2006</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>occup_back_2006_2008 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2006,</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> occup_back_2008_2010<span class="sc">$</span>old,</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_new =</span> <span class="st">&quot;g_new_c2c&quot;</span>,</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_old =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(occup_2010, occup_2012),</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>),</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>)</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>occup_2006_new <span class="ot">&lt;-</span> occup_back_2006_2008<span class="sc">$</span>old</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>occup_2008_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>old <span class="co"># or occup_back_2006_2008$new</span></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>occup_2010_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>new</span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>occup_2012_new <span class="ot">&lt;-</span> <span class="fu">dummy_c2c</span>(occup_2012, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">ml =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>))</span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>final_data_back_ml <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">list</span>(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new))</span></code></pre></div>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2008, <span class="at">new =</span> occup_2010, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(occup_2010, occup_2012),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 2008 -&gt; 2006</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>occup_back_2006_2008 <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">old =</span> occup_2006,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">new =</span> occup_back_2008_2010<span class="sc">$</span>old,</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_new =</span> <span class="st">&quot;g_new_c2c&quot;</span>,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var_old =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">time_var =</span> <span class="st">&quot;year&quot;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>),</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">ml =</span> <span class="fu">list</span>(</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(occup_2010, occup_2012),</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>,</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>),</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">features =</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;edu&quot;</span>, <span class="st">&quot;exp&quot;</span>, <span class="st">&quot;parttime&quot;</span>, <span class="st">&quot;salary&quot;</span>),</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">10</span>)</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>occup_2006_new <span class="ot">&lt;-</span> occup_back_2006_2008<span class="sc">$</span>old</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>occup_2008_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>old <span class="co"># or occup_back_2006_2008$new</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>occup_2010_new <span class="ot">&lt;-</span> occup_back_2008_2010<span class="sc">$</span>new</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>occup_2012_new <span class="ot">&lt;-</span> <span class="fu">dummy_c2c</span>(occup_2012, <span class="at">cat_var =</span> <span class="st">&quot;code&quot;</span>, <span class="at">ml =</span> <span class="fu">c</span>(<span class="st">&quot;knn&quot;</span>))</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>final_data_back_ml <span class="ot">&lt;-</span> <span class="fu">do.call</span>(</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>  rbind, </span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)</span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Valiation of global counts and per variable level counts.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>counts_new <span class="ot">&lt;-</span> final_data_back_ml <span class="sc">%&gt;%</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_c2c</span>() <span class="sc">%&gt;%</span></span>
@@ -1990,8 +2012,11 @@ if we will use the unified categorical variable.</p>
 <h3>Regression - neutral impact</h3>
 <p>The next 3 regressions have the same results.</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## orginal dataset</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>lms2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp, occup_old, <span class="at">weights =</span> multiplier)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lms2)</span></code></pre></div>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>lms2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp, occup_old,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> multiplier</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lms2)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = I(log(salary)) ~ age + sex + factor(edu) + parttime + 
@@ -2023,12 +2048,16 @@ if we will use the unified categorical variable.</p>
 ## F-statistic:  2239 on 11 and 17211 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">## using one highest cross weights</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="do">## cross_c2c to cross differen methods weights</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="do">## prune_c2c - highest1 leave only one the highest probability obs for each subject</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>occup_old_2 <span class="ot">&lt;-</span> occup_2<span class="sc">$</span>old <span class="sc">%&gt;%</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_c2c</span>(., <span class="fu">c</span>(<span class="st">&quot;wei_freq_c2c&quot;</span>, <span class="st">&quot;wei_knn_c2c&quot;</span>), <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(., <span class="at">column =</span> <span class="st">&quot;wei_cross_c2c&quot;</span>, <span class="at">method =</span> <span class="st">&quot;highest1&quot;</span>)</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>lms <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp, occup_old_2, <span class="at">weights =</span> multiplier)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lms)</span></code></pre></div>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="do">## prune_c2c</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="do">## highest1 leave only one the highest probability obs for each subject</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>occup_old_2 <span class="ot">&lt;-</span> occup_2<span class="sc">$</span>old <span class="sc">%&gt;%</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cross_c2c</span>(., <span class="fu">c</span>(<span class="st">&quot;wei_freq_c2c&quot;</span>, <span class="st">&quot;wei_knn_c2c&quot;</span>), <span class="fu">c</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(., <span class="at">column =</span> <span class="st">&quot;wei_cross_c2c&quot;</span>, <span class="at">method =</span> <span class="st">&quot;highest1&quot;</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>lms <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp, occup_old_2,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> multiplier</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lms)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = I(log(salary)) ~ age + sex + factor(edu) + parttime + 
@@ -2061,10 +2090,13 @@ if we will use the unified categorical variable.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">## we have to adjust size of stds as we artificialy enlarge degrees of freedom</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>occup_old_3 <span class="ot">&lt;-</span> occup_2<span class="sc">$</span>old <span class="sc">%&gt;%</span></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(<span class="at">method =</span> <span class="st">&quot;nonzero&quot;</span>) <span class="co"># many prune methods like highest</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>lms_replicated <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp, occup_old_3, <span class="at">weights =</span> multiplier <span class="sc">*</span> wei_freq_c2c)</span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjusted R2 is meaningless here</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>lms_replicated<span class="sc">$</span>df.residual <span class="ot">&lt;-</span> <span class="fu">nrow</span>(occup_old) <span class="sc">-</span> <span class="fu">length</span>(lms_replicated<span class="sc">$</span>assign)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressWarnings</span>(<span class="fu">summary</span>(lms_replicated))</span></code></pre></div>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>lms_replicated <span class="ot">&lt;-</span> <span class="fu">lm</span>(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp, occup_old_3,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">weights =</span> multiplier <span class="sc">*</span> wei_freq_c2c</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjusted R2 is meaningless here</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>lms_replicated<span class="sc">$</span>df.residual <span class="ot">&lt;-</span> <span class="fu">nrow</span>(occup_old) <span class="sc">-</span> <span class="fu">length</span>(lms_replicated<span class="sc">$</span>assign)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressWarnings</span>(<span class="fu">summary</span>(lms_replicated))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = I(log(salary)) ~ age + sex + factor(edu) + parttime + 
@@ -2100,19 +2132,22 @@ if we will use the unified categorical variable.</p>
 <p>Example regression model with usage of the unified variable
 (<code>g_new_c2c</code>). A separate model for each occupational
 group.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>formula_oo <span class="ot">&lt;-</span> <span class="fu">formula</span>(<span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp <span class="sc">+</span> <span class="fu">factor</span>(year))</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>oo <span class="ot">&lt;-</span> final_data_back <span class="sc">%&gt;%</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(<span class="at">method =</span> <span class="st">&quot;nonzero&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># many prune methods like highest</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(g_new_c2c) <span class="sc">%&gt;%</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do</span>(</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summary</span>(<span class="fu">lm</span>(formula_oo, ., <span class="at">weights =</span> multiplier <span class="sc">*</span> wei_freq_c2c)),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.null</span>(lm))</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(oo)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>formula_oo <span class="ot">&lt;-</span> <span class="fu">formula</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">I</span>(<span class="fu">log</span>(salary)) <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(edu) <span class="sc">+</span> parttime <span class="sc">+</span> exp <span class="sc">+</span> <span class="fu">factor</span>(year)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>oo <span class="ot">&lt;-</span> final_data_back <span class="sc">%&gt;%</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prune_c2c</span>(<span class="at">method =</span> <span class="st">&quot;nonzero&quot;</span>) <span class="sc">%&gt;%</span> <span class="co"># many prune methods like highest</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(g_new_c2c) <span class="sc">%&gt;%</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;=</span> <span class="dv">15</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do</span>(</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">lm =</span> <span class="fu">tryCatch</span>(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summary</span>(<span class="fu">lm</span>(formula_oo, ., <span class="at">weights =</span> multiplier <span class="sc">*</span> wei_freq_c2c)),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.null</span>(lm))</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(oo)</span></code></pre></div>
 <pre><code>## # A tibble: 6 × 2
 ## # Rowwise: 
 ##   g_new_c2c lm        
@@ -2120,9 +2155,9 @@ group.</p>
 ## 1 111103    &lt;smmry.lm&gt;
 ## 2 111201    &lt;smmry.lm&gt;
 ## 3 111301    &lt;smmry.lm&gt;
-## 4 111405    &lt;smmry.lm&gt;
-## 5 112001    &lt;smmry.lm&gt;
-## 6 112002    &lt;smmry.lm&gt;</code></pre>
+## 4 112001    &lt;smmry.lm&gt;
+## 5 112002    &lt;smmry.lm&gt;
+## 6 112004    &lt;smmry.lm&gt;</code></pre>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>oo<span class="sc">$</span>lm[[<span class="dv">2</span>]]</span></code></pre></div>
 <pre><code>## 
 ## Call:
@@ -2156,8 +2191,8 @@ group.</p>
 <div id="manual-mappings" class="section level2">
 <h2>Manual mappings</h2>
 <p><code>cat2cat_agg</code> is mainly useful for aggregate datasets.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cat2cat)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(verticals)</span>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cat2cat&quot;</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;verticals&quot;</span>, <span class="at">package =</span> <span class="st">&quot;cat2cat&quot;</span>)</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>agg_old <span class="ot">&lt;-</span> verticals[verticals<span class="sc">$</span>v_date <span class="sc">==</span> <span class="st">&quot;2020-04-01&quot;</span>, ]</span>
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>agg_new <span class="ot">&lt;-</span> verticals[verticals<span class="sc">$</span>v_date <span class="sc">==</span> <span class="st">&quot;2020-05-01&quot;</span>, ]</span>
@@ -2178,7 +2213,7 @@ group.</p>
 <span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a><span class="do">## possible processing</span></span>
-<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
 <span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>agg <span class="sc">%&gt;%</span></span>
 <span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(v_date, vertical) <span class="sc">%&gt;%</span></span>
@@ -2209,7 +2244,7 @@ Unfortunately we have to assume that a subject could not change the
 category level over time.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cat2cat)</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="do">## the ean variable is a unique identifier</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(verticals2)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;verticals2&quot;</span>, <span class="at">package =</span> <span class="st">&quot;cat2cat&quot;</span>)</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>vert_old <span class="ot">&lt;-</span> verticals2[verticals2<span class="sc">$</span>v_date <span class="sc">==</span> <span class="st">&quot;2020-04-01&quot;</span>, ]</span>
 <span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>vert_new <span class="ot">&lt;-</span> verticals2[verticals2<span class="sc">$</span>v_date <span class="sc">==</span> <span class="st">&quot;2020-05-01&quot;</span>, ]</span>
@@ -2223,9 +2258,10 @@ category level over time.</p>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="do">## it is important to set id_var as then we merging categories 1 to 1</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="do">## for this identifier which exists in both periods.</span></span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>verts <span class="ot">&lt;-</span> <span class="fu">cat2cat</span>(</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> vert_old, <span class="at">new =</span> vert_new, <span class="at">id_var =</span> <span class="st">&quot;ean&quot;</span>, <span class="at">cat_var =</span> <span class="st">&quot;vertical&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;v_date&quot;</span>),</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans_v, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">list</span>(<span class="at">old =</span> vert_old, <span class="at">new =</span> vert_new, <span class="at">id_var =</span> <span class="st">&quot;ean&quot;</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">cat_var =</span> <span class="st">&quot;vertical&quot;</span>, <span class="at">time_var =</span> <span class="st">&quot;v_date&quot;</span>),</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mappings =</span> <span class="fu">list</span>(<span class="at">trans =</span> trans_v, <span class="at">direction =</span> <span class="st">&quot;backward&quot;</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 
 
