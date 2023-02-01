@@ -1,8 +1,8 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(size = "tiny")
-knitr::opts_chunk$set(message = F)
-knitr::opts_chunk$set(warning = F)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
 
 ## ---- message=FALSE, warning=FALSE--------------------------------------------
 library("cat2cat")
@@ -30,7 +30,8 @@ occup_simple <- cat2cat(
 ## where probability will be assessed as fraction of closest points.
 occup_2 <- cat2cat(
   data = list(
-    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+    old = occup_old, new = occup_new,
+    cat_var = "code", time_var = "year"
   ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
@@ -50,7 +51,8 @@ plot_c2c(occup_2$old, type = c("both"))
 # mix of methods
 occup_2_mix <- cat2cat(
   data = list(
-    old = occup_old, new = occup_new, cat_var = "code", time_var = "year"
+    old = occup_old, new = occup_new,
+    cat_var = "code", time_var = "year"
   ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
@@ -73,21 +75,23 @@ occup_2_mix$old %>%
   cor()
 
 ## -----------------------------------------------------------------------------
-# 2010 -> 2008
+# from 2010 to 2008
 occup_back_2008_2010 <- cat2cat(
   data = list(
-    old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"
+    old = occup_2008, new = occup_2010,
+    cat_var = "code", time_var = "year"
   ),
   mappings = list(trans = trans, direction = "backward")
 )
 
 # optional, give more control
 # the counts could be any of wei_* or their combination
-freqs_df <- occup_back_2008_2010$old[, c("g_new_c2c", "wei_freq_c2c")] %>%
+freqs_df <-
+  occup_back_2008_2010$old[, c("g_new_c2c", "wei_freq_c2c")] %>%
   group_by(g_new_c2c) %>%
   summarise(counts = round(sum(wei_freq_c2c)))
 
-# 2008 -> 2006
+# from 2008 to 2006
 occup_back_2006_2008 <- cat2cat(
   data = list(
     old = occup_2006,
@@ -96,18 +100,22 @@ occup_back_2006_2008 <- cat2cat(
     cat_var_old = "code",
     time_var = "year"
   ),
-  mappings = list(trans = trans, direction = "backward", freqs_df = freqs_df)
+  mappings = list(
+    trans = trans, direction = "backward",
+    freqs_df = freqs_df
+  )
 )
 
-occup_2006_new <- occup_back_2006_2008$old
-occup_2008_new <- occup_back_2008_2010$old # or occup_back_2006_2008$new
-occup_2010_new <- occup_back_2008_2010$new
+o_2006_new <- occup_back_2006_2008$old
+# or occup_back_2006_2008$new
+o_2008_new <- occup_back_2008_2010$old
+o_2010_new <- occup_back_2008_2010$new
 # use ml argument when applied ml models
-occup_2012_new <- dummy_c2c(occup_2012, "code")
+o_2012_new <- dummy_c2c(occup_2012, "code")
 
 final_data_back <- do.call(
-  rbind, 
-  list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)
+  rbind,
+  list(o_2006_new, o_2008_new, o_2010_new, o_2012_new)
 )
 
 ## -----------------------------------------------------------------------------
@@ -133,28 +141,35 @@ counts_per_level <- final_data_back %>%
   arrange(g_new_c2c, year)
 
 ## -----------------------------------------------------------------------------
-trans2 <- rbind(trans, 
-                data.frame(
-                  old = "no_cat",
-                  new = setdiff(c(occup_2010$code, occup_2012$code), trans$new)
-                ))
+trans2 <- rbind(
+  trans,
+  data.frame(
+    old = "no_cat",
+    new = setdiff(
+      c(occup_2010$code, occup_2012$code),
+      trans$new
+    )
+  )
+)
 
 ## -----------------------------------------------------------------------------
-# 2008 -> 2010
+# from 2008 to 2010
 occup_for_2008_2010 <- cat2cat(
   data = list(
-    old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"
+    old = occup_2008, new = occup_2010,
+    cat_var = "code", time_var = "year"
   ),
   mappings = list(trans = trans2, direction = "forward")
 )
 
 # optional, give more control
 # the counts could be any of wei_* or their combination
-freqs_df <- occup_for_2008_2010$new[, c("g_new_c2c", "wei_freq_c2c")] %>%
+freqs_df <-
+  occup_for_2008_2010$new[, c("g_new_c2c", "wei_freq_c2c")] %>%
   group_by(g_new_c2c) %>%
   summarise(counts = round(sum(wei_freq_c2c)))
 
-# 2010 -> 2012
+# from2010 to 2012
 occup_for_2010_2012 <- cat2cat(
   data = list(
     old = occup_for_2008_2010$new,
@@ -163,18 +178,21 @@ occup_for_2010_2012 <- cat2cat(
     cat_var_new = "code",
     time_var = "year"
   ),
-  mappings = list(trans = trans2, direction = "forward", freqs_df = freqs_df)
+  mappings = list(
+    trans = trans2, direction = "forward",
+    freqs_df = freqs_df
+  )
 )
 
 # use ml argument when applied ml models
-occup_2006_new <- dummy_c2c(occup_2006, "code")
-occup_2008_new <- occup_for_2008_2010$old
-occup_2010_new <- occup_for_2008_2010$new # or occup_for_2010_2012$old
-occup_2012_new <- occup_for_2010_2012$new
+o_2006_new <- dummy_c2c(occup_2006, "code")
+o_2008_new <- occup_for_2008_2010$old
+o_2010_new <- occup_for_2008_2010$new # or occup_for_2010_2012$old
+o_2012_new <- occup_for_2010_2012$new
 
 final_data_for <- do.call(
-  rbind, 
-  list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)
+  rbind,
+  list(o_2006_new, o_2008_new, o_2010_new, o_2012_new)
 )
 
 ## -----------------------------------------------------------------------------
@@ -200,10 +218,11 @@ counts_per_level <- final_data_for %>%
   arrange(g_new_c2c, year)
 
 ## -----------------------------------------------------------------------------
-# 2010 -> 2008
+# from 2010 to 2008
 occup_back_2008_2010 <- cat2cat(
   data = list(
-    old = occup_2008, new = occup_2010, cat_var = "code", time_var = "year"
+    old = occup_2008, new = occup_2010,
+    cat_var = "code", time_var = "year"
   ),
   mappings = list(trans = trans, direction = "backward"),
   ml = list(
@@ -215,7 +234,7 @@ occup_back_2008_2010 <- cat2cat(
   )
 )
 
-# 2008 -> 2006
+# from 2008 to 2006
 occup_back_2006_2008 <- cat2cat(
   data = list(
     old = occup_2006,
@@ -234,14 +253,15 @@ occup_back_2006_2008 <- cat2cat(
   )
 )
 
-occup_2006_new <- occup_back_2006_2008$old
-occup_2008_new <- occup_back_2008_2010$old # or occup_back_2006_2008$new
-occup_2010_new <- occup_back_2008_2010$new
-occup_2012_new <- dummy_c2c(occup_2012, cat_var = "code", ml = c("knn"))
+o_2006_new <- occup_back_2006_2008$old
+# or occup_back_2006_2008$new
+o_2008_new <- occup_back_2008_2010$old
+o_2010_new <- occup_back_2008_2010$new
+o_2012_new <- dummy_c2c(occup_2012, cat_var = "code", ml = c("knn"))
 
 final_data_back_ml <- do.call(
-  rbind, 
-  list(occup_2006_new, occup_2008_new, occup_2010_new, occup_2012_new)
+  rbind,
+  list(o_2006_new, o_2008_new, o_2010_new, o_2012_new)
 )
 
 ## -----------------------------------------------------------------------------
@@ -280,7 +300,8 @@ all.equal(nrow(ff), sum(final_data_back_ml$wei_freq_c2c))
 ## -----------------------------------------------------------------------------
 ## orginal dataset
 lms2 <- lm(
-  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old,
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp,
+  data = occup_old,
   weights = multiplier
 )
 summary(lms2)
@@ -290,23 +311,27 @@ summary(lms2)
 ## prune_c2c
 ## highest1 leave only one the highest probability obs for each subject
 occup_old_2 <- occup_2$old %>%
-  cross_c2c(., c("wei_freq_c2c", "wei_knn_c2c"), c(1 / 2, 1 / 2)) %>%
+  cross_c2c(., c("wei_freq_c2c", "wei_knn_c2c"), c(1, 1) / 2) %>%
   prune_c2c(., column = "wei_cross_c2c", method = "highest1")
 lms <- lm(
-  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_2,
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp,
+  data = occup_old_2,
   weights = multiplier
 )
 summary(lms)
 
-## we have to adjust size of stds as we artificialy enlarge degrees of freedom
+## we have to adjust size of stds
+## as we artificialy enlarge degrees of freedom
 occup_old_3 <- occup_2$old %>%
   prune_c2c(method = "nonzero") # many prune methods like highest
 lms_replicated <- lm(
-  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp, occup_old_3,
+  I(log(salary)) ~ age + sex + factor(edu) + parttime + exp,
+  data = occup_old_3,
   weights = multiplier * wei_freq_c2c
 )
 # Adjusted R2 is meaningless here
-lms_replicated$df.residual <- nrow(occup_old) - length(lms_replicated$assign)
+lms_replicated$df.residual <-
+  nrow(occup_old) - length(lms_replicated$assign)
 suppressWarnings(summary(lms_replicated))
 
 ## -----------------------------------------------------------------------------
@@ -316,7 +341,7 @@ formula_oo <- formula(
 oo <- final_data_back %>%
   prune_c2c(method = "nonzero") %>% # many prune methods like highest
   group_by(g_new_c2c) %>%
-  filter(n() >= 15) %>% 
+  filter(n() >= 15) %>%
   do(
     lm = tryCatch(
       summary(lm(formula_oo, ., weights = multiplier * wei_freq_c2c)),
@@ -354,12 +379,14 @@ agg <- cat2cat_agg(
 ## possible processing
 library("dplyr")
 agg %>%
-    bind_rows() %>%
-    group_by(v_date, vertical) %>%
-    summarise(sales = sum(sales * prop_c2c),
-              counts = sum(counts * prop_c2c),
-              v_date = first(v_date), 
-              .groups = "drop")
+  bind_rows() %>%
+  group_by(v_date, vertical) %>%
+  summarise(
+    sales = sum(sales * prop_c2c),
+    counts = sum(counts * prop_c2c),
+    v_date = first(v_date),
+    .groups = "drop"
+  )
 
 ## -----------------------------------------------------------------------------
 library(cat2cat)
@@ -380,8 +407,10 @@ trans_v <- vert_old %>%
 ## it is important to set id_var as then we merging categories 1 to 1
 ## for this identifier which exists in both periods.
 verts <- cat2cat(
-  data = list(old = vert_old, new = vert_new, id_var = "ean",
-              cat_var = "vertical", time_var = "v_date"),
+  data = list(
+    old = vert_old, new = vert_new, id_var = "ean",
+    cat_var = "vertical", time_var = "v_date"
+  ),
   mappings = list(trans = trans_v, direction = "backward")
 )
 
