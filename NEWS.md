@@ -1,3 +1,11 @@
+# cat2cat 0.4.7
+
+* New `cat2cat_ml_run` function to check the ml models performance before `cat2cat` with ml option is run. Now, the ml models are more transparent.
+* Add tests for cat2cat related journal (softwarex) paper.
+* Add CITATION file.
+* Internal changes to make the code base more clear.
+* Replace itemize with describe in the latex documentation.
+
 # cat2cat 0.4.6
 
 * Add some `ropensci` standards, like CONTRIBUTING file and `testthat` version 3.

@@ -4,7 +4,7 @@ knitr::opts_chunk$set(size = "tiny")
 knitr::opts_chunk$set(message = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
 
-## ---- message=FALSE, warning=FALSE--------------------------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 library("cat2cat")
 library("dplyr")
 
@@ -218,20 +218,25 @@ counts_per_level <- final_data_for %>%
   arrange(g_new_c2c, year)
 
 ## -----------------------------------------------------------------------------
+ml_setup <- list(
+    data = dplyr::bind_rows(occup_2010, occup_2012),
+    cat_var = "code",
+    method = c("knn"),
+    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
+    args = list(k = 10)
+)
+mappings <- list(trans = trans, direction = "backward")
+# ml model performance check
+print(cat2cat_ml_run(mappings, ml_setup))
+
 # from 2010 to 2008
 occup_back_2008_2010 <- cat2cat(
   data = list(
     old = occup_2008, new = occup_2010,
     cat_var = "code", time_var = "year"
   ),
-  mappings = list(trans = trans, direction = "backward"),
-  ml = list(
-    data = dplyr::bind_rows(occup_2010, occup_2012),
-    cat_var = "code",
-    method = c("knn"),
-    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
-    args = list(k = 10)
-  )
+  mappings = mappings,
+  ml = ml_setup
 )
 
 # from 2008 to 2006
@@ -243,14 +248,8 @@ occup_back_2006_2008 <- cat2cat(
     cat_var_old = "code",
     time_var = "year"
   ),
-  mappings = list(trans = trans, direction = "backward"),
-  ml = list(
-    data = dplyr::bind_rows(occup_2010, occup_2012),
-    cat_var = "code",
-    method = c("knn"),
-    features = c("age", "sex", "edu", "exp", "parttime", "salary"),
-    args = list(k = 10)
-  )
+  mappings = mappings,
+  ml = ml_setup
 )
 
 o_2006_new <- occup_back_2006_2008$old

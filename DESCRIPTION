@@ -1,7 +1,7 @@
 Package: cat2cat
 Title: Handling an Inconsistently Coded Categorical Variable in a
         Longitudinal Dataset
-Version: 0.4.6
+Version: 0.4.7
 Authors@R: person("Maciej", "Nasinski", email = "nasinski.maciej@gmail.com", role = c("aut", "cre"))
 Maintainer: Maciej Nasinski <nasinski.maciej@gmail.com>
 Description: 
@@ -16,14 +16,14 @@ URL: https://github.com/Polkas/cat2cat,
 BugReports: https://github.com/Polkas/cat2cat/issues
 Encoding: UTF-8
 Imports: MASS
-Suggests: caret, randomForest, knitr, rmarkdown, pacman, testthat (>=
-        3.0.0), magrittr, dplyr
+Suggests: caret, dplyr, forcats, knitr, magrittr, randomForest,
+        rmarkdown, testthat (>= 3.0.0), tidyr
 LazyData: true
 VignetteBuilder: knitr
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-02-01 20:41:10 UTC; maciejnasinski
+Packaged: 2024-01-22 21:52:58 UTC; maciejnasinski
 Author: Maciej Nasinski [aut, cre]
 Repository: CRAN
-Date/Publication: 2023-02-01 21:40:02 UTC
+Date/Publication: 2024-01-22 22:42:46 UTC
