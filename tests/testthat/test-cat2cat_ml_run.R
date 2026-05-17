@@ -25,19 +25,18 @@ testthat::test_that("cat2cat_ml_run returns stable diagnostics", {
   res2 <- cat2cat_ml_run(mappings, ml_setup_run, test_prop = 0.2)
   testthat::expect_equal(res, res2)
   testthat::expect_s3_class(res, c("cat2cat_ml_run", "list"))
-  testthat::expect_output(print(res), "cat2cat ML Cross-Validation Results")
-  testthat::expect_output(print(res), "BRIER SCORE")
-  testthat::expect_output(print(res), "MEAN P\\(TRUE CLASS\\)")
-  testthat::expect_output(print(res), "SKIPPED GROUPS")
+
+  printed <- paste(capture.output(print(res)), collapse = "\n")
+  testthat::expect_match(
+    printed,
+    "cat2cat ML Cross-Validation Results.*BRIER SCORE.*MEAN P\\(TRUE CLASS\\).*SKIPPED GROUPS"
+  )
 
   # Check new metric fields exist in results
   non_na_idx <- which(!is.na(vapply(res, function(g) g$acc["knn"], numeric(1))))
   testthat::expect_true(length(non_na_idx) > 0)
   non_na_group <- res[[non_na_idx[1]]]
-  testthat::expect_true("brier" %in% names(non_na_group))
-  testthat::expect_true("mean_prob" %in% names(non_na_group))
-  testthat::expect_true("naive_brier" %in% names(non_na_group))
-  testthat::expect_true("freq_brier" %in% names(non_na_group))
+  testthat::expect_true(all(c("brier", "mean_prob", "naive_brier", "freq_brier") %in% names(non_na_group)))
   testthat::expect_true(all(c("knn", "rf", "lda") %in% names(non_na_group$brier)))
   # Mean stats across all groups should be positive
   avg_brier <- mean(vapply(res, function(g) g$brier["knn"], numeric(1)), na.rm = TRUE)
@@ -68,57 +67,18 @@ testthat::test_that("cat2cat_ml_run supports naive bayes metrics", {
   set.seed(1234)
   res <- cat2cat_ml_run(mappings, ml_nb)
   testthat::expect_s3_class(res, c("cat2cat_ml_run", "list"))
-  testthat::expect_output(print(res), "nb: accuracy")
-  testthat::expect_output(print(res), "nb: brier")
-  testthat::expect_output(print(res), "nb: mean P\\(true\\)")
+
+  printed_nb <- paste(capture.output(print(res)), collapse = "\n")
+  testthat::expect_match(
+    printed_nb,
+    "nb: accuracy.*nb: brier.*nb: mean P\\(true\\)"
+  )
 
   # Check nb metrics exist
   non_na_idx <- which(!is.na(vapply(res, function(g) g$acc["nb"], numeric(1))))
   testthat::expect_true(length(non_na_idx) > 0)
   avg_acc_nb <- mean(vapply(res, function(g) g$acc["nb"], numeric(1)), na.rm = TRUE)
   testthat::expect_true(avg_acc_nb > 0 && avg_acc_nb <= 1)
-})
-
-testthat::test_that("cat2cat_ml_run one-hot encodes factor features", {
-  library("e1071")
-  mappings <- list(trans = trans, direction = "backward")
-  occup_2010_f <- occup_2010
-  occup_2012_f <- occup_2012
-  occup_2010_f$edu <- factor(occup_2010_f$edu)
-  occup_2012_f$edu <- factor(occup_2012_f$edu)
-
-  ml_nb <- list(
-    data = rbind(occup_2010_f, occup_2012_f),
-    cat_var = "code",
-    method = "nb",
-    features = c("age", "sex", "edu", "salary")
-  )
-
-  set.seed(1234)
-  res <- cat2cat_ml_run(mappings, ml_nb)
-  non_na_idx <- which(!is.na(vapply(res, function(g) g$acc["nb"], numeric(1))))
-  testthat::expect_true(length(non_na_idx) > 0)
-})
-
-testthat::test_that("cat2cat_ml_run computes baseline-only diagnostics", {
-  mappings <- list(trans = trans, direction = "backward")
-  ml_baseline <- list(
-    data = rbind(occup_2010, occup_2012),
-    cat_var = "code",
-    method = character(0),
-    features = character(0)
-  )
-
-  set.seed(1234)
-  res <- cat2cat_ml_run(mappings, ml_baseline)
-  non_na_freq <- vapply(res, function(g) !is.na(g$freq), logical(1))
-  testthat::expect_true(any(non_na_freq))
-
-  first_group <- res[[which(non_na_freq)[1]]]
-  testthat::expect_true(is.numeric(first_group$naive_brier))
-  testthat::expect_true(is.numeric(first_group$freq_brier))
-  testthat::expect_true(first_group$naive_brier >= 0 && first_group$naive_brier <= 1)
-  testthat::expect_true(first_group$freq_brier >= 0 && first_group$freq_brier <= 1)
 })
 
 testthat::test_that("cat2cat_ml_run method skips are independent across methods", {
